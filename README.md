@@ -3,17 +3,14 @@
 </h1>
 
 <p align="center">
-    <a href="https://github.com/daijro/browserforge/blob/main/LICENSE?color=yellow">
-        <img src="https://img.shields.io/github/license/daijro/browserforge.svg">
+    <a href="https://github.com/daijro/browserforge/blob/main/LICENSE">
+        <img src="https://img.shields.io/github/license/daijro/browserforge.svg?color=yellow">
     </a>
     <a href="https://python.org/">
         <img src="https://img.shields.io/badge/python-3.8&#8208;3.12-blue">
     </a>
     <a href="https://pypi.org/project/browserforge/">
         <img alt="PyPI" src="https://img.shields.io/pypi/v/browserforge.svg?color=orange">
-    </a>
-    <a href="https://pepy.tech/project/browserforge">
-        <img alt="PyPI" src="https://static.pepy.tech/badge/browserforge">
     </a>
     <a href="https://github.com/ambv/black">
         <img src="https://img.shields.io/badge/code%20style-black-black.svg">
@@ -26,9 +23,9 @@
     </a>
 </p>
 
-<h5 align="center">
+<h4 align="center">
     🎭 Intelligent browser header & fingerprint generator
-</h5>
+</h4>
 
 ---
 
@@ -59,9 +56,9 @@ python -m browserforge update
 
 ## Usage
 
-### Generating Headers
+## Generating Headers
 
-#### Simple usage
+### Simple usage
 
 ```py
 >>> from browserforge.headers import HeaderGenerator
@@ -104,9 +101,9 @@ Parameters:
 
 </details>
 
-#### Constraining headers
+### Constraining headers
 
-##### Single constraint
+#### Single constraint
 
 Set constraints for browsers by passing the optional strings below:
 
@@ -120,7 +117,7 @@ headers = HeaderGenerator(
 )
 ```
 
-##### Multiple constraints
+#### Multiple constraints
 
 Set multiple constraints to select from. Options are selected based on their actual frequency in the wild:
 
@@ -151,7 +148,7 @@ headers = HeaderGenerator(browser=browsers)
 
 Note that all constraints passed into the `HeaderGenerator` constructor can be overridden by passing them into the `generate` method.
 
-##### Generate headers given User-Agent
+#### Generate headers given User-Agent
 
 Headers can be generated given an existing user agent:
 
@@ -170,9 +167,9 @@ Select from multiple User-Agents based on their frequency in the wild:
 
 <hr width=50>
 
-### Generating Fingerprints
+## Generating Fingerprints
 
-#### Simple usage
+### Simple usage
 
 Initialize FingerprintGenerator:
 
@@ -431,9 +428,9 @@ Fingerprint(screen=ScreenFingerprint(availHeight=784,
 
 </details>
 
-#### Constraining fingerprints
+### Constraining fingerprints
 
-##### Screen width/height
+#### Screen width/height
 
 Constrain the minimum/maximum screen width and height:
 
@@ -452,7 +449,7 @@ fingerprints = FingerprintGenerator(screen=screen)
 
 Note: Not all bounds need to be defined.
 
-##### Browser specifications
+#### Browser specifications
 
 `FingerprintGenerator` and `FingerprintGenerator.generate` inherit the same parameters from `HeaderGenerator`.
 
@@ -468,7 +465,7 @@ fingerprint.generate(browser='chrome', os='windows')
 
 ## Uninstall
 
-To fully remove all files, run the following command:
+To fully remove all files, run the following commands:
 
 ```
 python -m browserforge remove
