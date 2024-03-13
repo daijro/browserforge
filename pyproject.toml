@@ -1,0 +1,36 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "browserforge"
+version = "1.0.0"
+description = "Intelligent browser header & fingerprint generator"
+authors = ["daijro <daijro.dev@gmail.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/daijro/browserforge"
+keywords = [
+    "client",
+    "headers",
+    "fingerprint",
+    "generator",
+    "browser",
+    "http",
+    "scraping",
+    "requests",
+    "playwright",
+]
+classifiers = [
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: Browsers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+click = "*"
+rich = "*"
+aiofiles = "*"
+httpx = "*"
+orjson = "*"
