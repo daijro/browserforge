@@ -12,6 +12,9 @@
     <a href="https://pypi.org/project/browserforge/">
         <img alt="PyPI" src="https://img.shields.io/pypi/v/browserforge.svg?color=orange">
     </a>
+    <a href="https://pepy.tech/project/browserforge">
+        <img alt="PyPI" src="https://static.pepy.tech/badge/browserforge">
+    </a>
     <a href="https://github.com/ambv/black">
         <img src="https://img.shields.io/badge/code%20style-black-black.svg">
     </a>
@@ -67,6 +70,17 @@ python -m browserforge update
 {'sec-ch-ua': '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"', 'Sec-Ch-Ua-Mobile': '?0', 'Sec-Ch-Ua-Platform': '"Windows"', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36', 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'Sec-Fetch-Site': '?1', 'Sec-Fetch-Mode': 'same-site', 'Sec-Fetch-User': 'document', 'Sec-Fetch-Dest': 'navigate', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept-Language': 'en-US;q=1.0'}
 ```
 
+### Using with requests
+
+Headers can be added to a session in [requests](https://github.com/psf/requests) (or similar libraries) by assigning them to the `headers` attribute:
+
+```py
+import requests
+session = requests.Session()
+# Set the session headers
+session.headers = headers.generate()
+```
+
 <details>
 <summary>Parameters for HeaderGenerator</summary>
 
@@ -74,7 +88,7 @@ python -m browserforge update
 Parameters:
     browser (Union[ListOrString, Iterable[Browser]], optional): Browser(s) or Browser object(s).
     os (ListOrString, optional): Operating system(s) to generate headers for.
-    device (ListOrString, optional): Device(s) to generate the headers for. Default is 'desktop'.
+    device (ListOrString, optional): Device(s) to generate the headers for.
     locale (ListOrString, optional): List of at most 10 languages for the Accept-Language header. Default is 'en-US'.
     http_version (Literal[1, 2], optional): Http version to be used to generate headers. Defaults to 2.
     strict (bool, optional): Throws an error if it cannot generate headers based on the input. Defaults to False.
@@ -185,7 +199,9 @@ fingerprints.generate()
 ```
 Parameters:
     screen (Screen, optional): Screen constraints for the generated fingerprint.
-    strict (bool): Whether to raise an exception if the constraints are too strict. Default is False.
+    strict (bool, optional): Whether to raise an exception if the constraints are too strict. Default is False.
+    mock_webrtc (bool, optional): Whether to mock WebRTC when injecting the fingerprint. Default is False.
+    slim (bool, optional): Disables performance-heavy evasions when injecting the fingerprint. Default is False.
     **header_kwargs: Header generation options for HeaderGenerator
 ```
 
@@ -202,6 +218,8 @@ Generates a fingerprint and a matching set of ordered headers using a combinatio
 Parameters:
     screen (Screen, optional): Screen constraints for the generated fingerprint.
     strict (bool, optional): Whether to raise an exception if the constraints are too strict.
+    mock_webrtc (bool, optional): Whether to mock WebRTC when injecting the fingerprint. Default is False.
+    slim (bool, optional): Disables performance-heavy evasions when injecting the fingerprint. Default is False.
     **header_kwargs: Additional header generation options for HeaderGenerator.generate
 ```
 
@@ -423,7 +441,9 @@ Fingerprint(screen=ScreenFingerprint(availHeight=784,
                                             'groupId': '',
                                             'kind': 'videoinput',
                                             'label': ''}]},
-            fonts=['Arial Unicode MS', 'Gill Sans', 'Helvetica Neue', 'Menlo'])
+            fonts=['Arial Unicode MS', 'Gill Sans', 'Helvetica Neue', 'Menlo']
+            mockWebRTC: False,
+            slim: False)
 ```
 
 </details>
@@ -460,6 +480,108 @@ Here is a usage example:
 ```py
 fingerprint.generate(browser='chrome', os='windows')
 ```
+
+<hr width=50>
+
+## Injecting Fingerprints
+
+BrowserForge is fully compatible with your existing Playwright and Pyppeteer code. You only have to change your context/page initialization.
+
+### Playwright
+
+#### Async API:
+
+```py
+# Import the AsyncNewContext injector
+from browserforge.injectors.playwright import AsyncNewContext
+
+async def main():
+    async with async_playwright() as playwright:
+        browser = await playwright.chromium.launch()
+        # Create a new async context with the injected fingerprint
+        context = await AsyncNewContext(browser, fingerprint=fingerprint)
+        page = await context.new_page()
+        ...
+```
+
+Replace `await browser.new_context` with `await AsyncNewContext` in your existing Playwright code.
+
+<details>
+<summary>Parameters for AsyncNewContext</summary>
+
+```
+Injects an async_api Playwright context with a Fingerprint.
+
+Parameters:
+    browser (Browser): The browser to create the context in
+    fingerprint (Optional[Fingerprint]): The fingerprint to inject. If None, one will be generated
+    fingerprint_options (Optional[Dict]): Options for the Fingerprint generator if `fingerprint` is not passed
+    **new_context_options: Other options for the new context
+```
+
+</details>
+
+#### Sync API:
+
+```py
+# Import the NewContext injector
+from browserforge.injectors.playwright import NewContext
+
+def main():
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        # Create a new context with the injected fingerprint
+        context = NewContext(browser, fingerprint=fingerprint)
+        page = context.new_page()
+        ...
+```
+
+Replace `browser.new_context` with `NewContext` in your existing Playwright code.
+
+<details>
+<summary>Parameters for NewContext</summary>
+
+```
+Injects an sync_api Playwright context with a Fingerprint.
+
+Parameters:
+    browser (Browser): The browser to create the context in
+    fingerprint (Optional[Fingerprint]): The fingerprint to inject. If None, one will be generated
+    fingerprint_options (Optional[Dict]): Options for the Fingerprint generator if `fingerprint` is not passed
+    **new_context_options: Other options for the new context
+```
+
+</details>
+
+### Pyppeteer
+
+```py
+# Import the NewPage injector
+from browserforge.injectors.pyppeteer import NewPage
+from pyppeteer import launch
+
+async def test():
+    browser = await launch()
+    # Create a new page with the injected fingerprint
+    page = await NewPage(browser, fingerprint=fingerprint)
+    ...
+```
+
+Replace `browser.newPage` with `NewPage` in your existing Pyppeteer code.
+
+<details>
+<summary>Parameters for NewPage</summary>
+
+```
+Injects a Pyppeteer browser object with a Fingerprint.
+
+Parameters:
+    browser (Browser): The browser to create the context in
+    fingerprint (Optional[Fingerprint]): The fingerprint to inject. If None, one will be generated
+    fingerprint_options (Optional[Dict]): Options for the Fingerprint generator if `fingerprint` is not passed
+```
+
+</details>
 
 <hr width=50>
 

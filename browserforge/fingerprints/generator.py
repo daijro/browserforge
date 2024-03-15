@@ -11,7 +11,7 @@ from browserforge.headers.utils import get_user_agent
 DATA_DIR: Path = Path(__file__).parent / 'data'
 
 
-@dataclass(frozen=True)
+@dataclass
 class ScreenFingerprint:
     availHeight: int
     availWidth: int
@@ -34,7 +34,7 @@ class ScreenFingerprint:
     hasHDR: bool
 
 
-@dataclass(frozen=True)
+@dataclass
 class NavigatorFingerprint:
     userAgent: str
     userAgentData: Dict[str, str]
@@ -57,13 +57,13 @@ class NavigatorFingerprint:
     extraProperties: Dict[str, str]
 
 
-@dataclass(frozen=True)
+@dataclass
 class VideoCard:
     renderer: str
     vendor: str
 
 
-@dataclass(frozen=True)
+@dataclass
 class Fingerprint:
     """Output data of the fingerprint generator"""
 
@@ -77,6 +77,8 @@ class Fingerprint:
     videoCard: Optional[VideoCard]
     multimediaDevices: List[str]
     fonts: List[str]
+    mockWebRTC: Optional[bool]
+    slim: Optional[bool]
 
 
 @dataclass
@@ -115,6 +117,8 @@ class FingerprintGenerator:
         self,
         screen: Optional[Screen] = None,
         strict: bool = False,
+        mock_webrtc: bool = False,
+        slim: bool = False,
         **header_kwargs,
     ):
         """
@@ -122,19 +126,26 @@ class FingerprintGenerator:
 
         Parameters:
             screen (Screen, optional): Screen constraints for the generated fingerprint.
-            strict (bool): Whether to raise an exception if the constraints are too strict. Default is False.
+            strict (bool, optional): Whether to raise an exception if the constraints are too strict. Default is False.
+            mock_webrtc (bool, optional): Whether to mock WebRTC when injecting the fingerprint. Default is False.
+            slim (bool, optional): Disables performance-heavy evasions when injecting the fingerprint. Default is False.
             **header_kwargs: Header generation options for HeaderGenerator
         """
         self.header_generator: HeaderGenerator = HeaderGenerator(**header_kwargs)
 
+        # Set default options
         self.screen: Optional[Screen] = screen
         self.strict: bool = strict
+        self.mock_webrtc: bool = mock_webrtc
+        self.slim: bool = slim
 
     def generate(
         self,
         *,
         screen: Optional[Screen] = None,
         strict: Optional[bool] = None,
+        mock_webrtc: Optional[bool] = None,
+        slim: Optional[bool] = None,
         **header_kwargs,
     ) -> Fingerprint:
         """
@@ -144,6 +155,8 @@ class FingerprintGenerator:
         Parameters:
             screen (Screen, optional): Screen constraints for the generated fingerprint.
             strict (bool, optional): Whether to raise an exception if the constraints are too strict.
+            mock_webrtc (bool, optional): Whether to mock WebRTC when injecting the fingerprint. Default is False.
+            slim (bool, optional): Disables performance-heavy evasions when injecting the fingerprint. Default is False.
             **header_kwargs: Additional header generation options for HeaderGenerator.generate
         """
         filtered_values: Dict[str, str] = {}
@@ -151,10 +164,8 @@ class FingerprintGenerator:
             header_kwargs = {}
 
         # merge new options with old
-        if screen is None:
-            screen = self.screen
-        if strict is None:
-            strict = self.strict
+        screen = _first(screen, self.screen)
+        strict = _first(strict, self.strict)
 
         partial_csp = self.partial_csp(
             strict=strict, screen=screen, filtered_values=filtered_values
@@ -201,25 +212,28 @@ class FingerprintGenerator:
                 )
 
         # Manually add the set of accepted languages required by the input
-        accept_language_header_value = headers.get(
-            'Accept-Language', headers.get('accept-language', '')
-        )
+        accept_language_header_value = headers.get('Accept-Language', '')
         accepted_languages = [
             locale.split(';', 1)[0] for locale in accept_language_header_value.split(',')
         ]
         fingerprint['languages'] = accepted_languages
 
-        return self._transform_fingerprint(fingerprint, headers)
+        return self._transform_fingerprint(
+            fingerprint,
+            headers,
+            _first(mock_webrtc, self.mock_webrtc),
+            _first(slim, self.slim),
+        )
 
     def partial_csp(
-        self, strict: bool, screen: Optional[Screen], filtered_values: Dict
+        self, strict: Optional[bool], screen: Optional[Screen], filtered_values: Dict
     ) -> Optional[Dict]:
         """
         Generates partial content security policy (CSP) based on the provided options and filtered values.
 
         Parameters:
-            strict (bool, optional): Whether to raise an exception if the constraints are too strict.
-            screen (Screen, optional): Screen for generating the partial CSP.
+            strict (Optional[bool): Whether to raise an exception if the constraints are too strict.
+            screen (Optional[Screen]): Screen for generating the partial CSP.
             filtered_values (Dict): Filtered values used for generating the partial CSP.
 
         Returns:
@@ -266,13 +280,17 @@ class FingerprintGenerator:
         )
 
     @staticmethod
-    def _transform_fingerprint(fingerprint: Dict, headers: Dict) -> Fingerprint:
+    def _transform_fingerprint(
+        fingerprint: Dict, headers: Dict, mock_webrtc: bool, slim: bool
+    ) -> Fingerprint:
         """
         Transforms fingerprint into a final dataclass instance.
 
         Parameters:
             fingerprint (Dict): Fingerprint to be transformed.
             headers (Dict): Generated headers.
+            mock_webrtc (bool): Whether to mock WebRTC when injecting the fingerprint.
+            slim (bool): Disables performance-heavy evasions when injecting the fingerprint.
 
         Returns:
             Fingerprint: Transformed fingerprint as a Fingerprint dataclass instance.
@@ -318,4 +336,13 @@ class FingerprintGenerator:
             ),
             multimediaDevices=fingerprint['multimediaDevices'],
             fonts=fingerprint['fonts'],
+            mockWebRTC=mock_webrtc,
+            slim=slim,
         )
+
+
+def _first(*values):
+    """
+    Simple function that returns the first non-None value passed
+    """
+    return next((v for v in values if v is not None), None)

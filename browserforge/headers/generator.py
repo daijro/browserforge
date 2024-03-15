@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple, Union, TypeAlias
+from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple, TypeAlias, Union
 
 import orjson
 
@@ -81,7 +81,7 @@ class HeaderGenerator:
         self,
         browser: Union[ListOrString, Iterable[Browser]] = SUPPORTED_BROWSERS,
         os: ListOrString = SUPPORTED_OPERATING_SYSTEMS,
-        device: ListOrString = 'desktop',
+        device: ListOrString = SUPPORTED_DEVICES,
         locale: ListOrString = 'en-US',
         http_version: Literal[1, 2] = 2,
         strict: bool = False,
@@ -92,7 +92,7 @@ class HeaderGenerator:
         Parameters:
             browser (Union[ListOrString, Iterable[Browser]], optional): Browser(s) or Browser object(s).
             os (ListOrString, optional): Operating system(s) to generate headers for.
-            device (ListOrString, optional): Device(s) to generate the headers for. Default is 'desktop'.
+            device (ListOrString, optional): Device(s) to generate the headers for.
             locale (ListOrString, optional): List of at most 10 languages for the Accept-Language header. Default is 'en-US'.
             http_version (Literal[1, 2], optional): Http version to be used to generate headers. Defaults to 2.
             strict (bool, optional): Throws an error if it cannot generate headers based on the input. Defaults to False.
