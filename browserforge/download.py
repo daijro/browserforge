@@ -9,13 +9,7 @@ from zipfile import ZipFile
 
 import aiofiles
 import httpx
-from rich.progress import (
-    BarColumn,
-    DownloadColumn,
-    Progress,
-    TaskID,
-    TransferSpeedColumn,
-)
+from rich.progress import BarColumn, DownloadColumn, Progress, TaskID, TransferSpeedColumn
 
 """
 Downloads the required model definitions

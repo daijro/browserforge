@@ -137,7 +137,7 @@ def _fingerprint(
     if fingerprint:
         return fingerprint
     generator = FingerprintGenerator()
-    fingerprint = generator.generate(**(fingerprint_options or {}))
+    return generator.generate(**(fingerprint_options or {}))
 
 
 def CheckIfInstalled(module_name: str):
@@ -146,5 +146,4 @@ def CheckIfInstalled(module_name: str):
     """
     import importlib.util
 
-    if importlib.util.find_spec(module_name) is None:
-        raise ImportError(f"Module {module_name} must be installed to use this injector.")
+    return importlib.util.find_spec(module_name) is not None

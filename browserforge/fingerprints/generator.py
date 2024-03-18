@@ -319,7 +319,7 @@ class FingerprintGenerator:
             )
         }
 
-        # Assuming 'languages' is a list and you always take the first element for 'language'.
+        # Always take the first element for 'language'
         navigator_kwargs['language'] = navigator_kwargs['languages'][0]
         navigator_kwargs['maxTouchPoints'] = fingerprint.get('maxTouchPoints', 0)
 

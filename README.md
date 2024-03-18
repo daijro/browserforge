@@ -211,8 +211,6 @@ Parameters:
 <summary>Parameters for FingerprintGenerator.generate</summary>
 
 ```
-Parameters:
-"""
 Generates a fingerprint and a matching set of ordered headers using a combination of the default options specified in the constructor and their possible overrides provided here.
 
 Parameters:
@@ -542,7 +540,7 @@ Replace `browser.new_context` with `NewContext` in your existing Playwright code
 <summary>Parameters for NewContext</summary>
 
 ```
-Injects an sync_api Playwright context with a Fingerprint.
+Injects a sync_api Playwright context with a Fingerprint.
 
 Parameters:
     browser (Browser): The browser to create the context in
@@ -552,6 +550,10 @@ Parameters:
 ```
 
 </details>
+
+#### Undetected-Playwright
+
+[Undetected-Playwright](https://github.com/kaliiiiiiiiii/undetected-playwright-python) is also supported in the `browserforge.injectors.undetected_playwright` package. The usage is the same as the Playwright injector.
 
 ### Pyppeteer
 

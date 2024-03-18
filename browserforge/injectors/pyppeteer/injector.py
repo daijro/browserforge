@@ -5,11 +5,7 @@ from pyppeteer.browser import Browser
 from pyppeteer.page import Page
 
 from browserforge.fingerprints import Fingerprint
-from browserforge.injectors.utils import (
-    InjectFunction,
-    _fingerprint,
-    only_injectable_headers,
-)
+from browserforge.injectors.utils import InjectFunction, _fingerprint, only_injectable_headers
 
 
 async def NewPage(
