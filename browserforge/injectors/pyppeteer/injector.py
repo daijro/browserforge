@@ -1,30 +1,99 @@
 import re
-from typing import Dict, Optional
+from dataclasses import dataclass
+from typing import Dict, Optional, Union
 
-from pyppeteer.browser import Browser
-from pyppeteer.page import Page
+from pyppeteer import launch as plaunch
+from pyppeteer.browser import Browser as PBrowser
+from pyppeteer.browser import BrowserContext as PBrowserContext
+from pyppeteer.page import Page as PPage
 
 from browserforge.fingerprints import Fingerprint
-from browserforge.injectors.utils import InjectFunction, _fingerprint, only_injectable_headers
+from browserforge.injectors.utils import (
+    InjectFunction,
+    MitmProxy,
+    _fingerprint,
+    only_injectable_headers,
+)
+
+
+async def launch(
+    *args,
+    fingerprint: Optional[Fingerprint] = None,
+    fingerprint_options: Optional[Dict] = None,
+    **kwargs,
+):
+    """
+    Parameters:
+        fingerprint (Optional[Fingerprint]): The fingerprint to inject. If None, one will be generated
+        fingerprint_options (Optional[Dict]): Options for the Fingerprint generator if `fingerprint` is not passed
+        *args: Arguments to pass to `pyppeteer.launch`
+        **kwargs: Keyword arguments to pass to `pyppeteer.launch`
+    """
+    fingerprint = _fingerprint(fingerprint, fingerprint_options)
+    mitm = MitmProxy(fingerprint)
+    mitm.launch()
+
+    browser = await plaunch(
+        *args,
+        **kwargs,
+        args=(*kwargs.get('args', []), f'--proxy-server={mitm.server}'),
+        ignoreHTTPSErrors=True,
+    )
+    return PyppeteerObject(browser, fingerprint, mitm)
+
+
+@dataclass
+class PyppeteerObject:
+    obj: Union[PBrowser, PBrowserContext]
+    fingerprint: Fingerprint
+    mitm: Optional[MitmProxy] = None
+
+    async def createIncognitoBrowserContext(self) -> PBrowserContext:
+        """
+        Creates a new incognito browser context with an injected MITM proxy
+        """
+        context = await self.obj.createIncognitoBrowserContext()
+        return PyppeteerObject(context, self.fingerprint)
+
+    async def newPage(
+        self,
+    ) -> PPage:
+        """
+        Creates a new page with an injected MITM proxy
+        """
+        return await NewPage(self.obj, self.fingerprint)
+
+    async def close(self):
+        """
+        Closes the browser
+        """
+        await self.obj.close()
+        if self.mitm:
+            self.mitm.close()
+
+    def __getattr__(self, name):
+        # Forward to the object
+        return getattr(self.obj, name)
 
 
 async def NewPage(
-    browser: Browser,
+    obj: Union[PBrowser, PBrowserContext],
     fingerprint: Optional[Fingerprint] = None,
     fingerprint_options: Optional[Dict] = None,
-) -> Page:
+) -> PPage:
     """
     Injects a Pyppeteer browser object with a Fingerprint.
 
     Parameters:
-        browser (Browser): The browser to create the context in
+        obj (Union[Browser, BrowserContext]): The browser/context to create the page in
         fingerprint (Optional[Fingerprint]): The fingerprint to inject. If None, one will be generated
         fingerprint_options (Optional[Dict]): Options for the Fingerprint generator if `fingerprint` is not passed
     """
     fingerprint = _fingerprint(fingerprint, fingerprint_options)
     function = InjectFunction(fingerprint)
-    # create a new page
-    page = await browser.newPage()
+
+    # Create a new page
+    page = await obj.newPage()
 
     await page.setUserAgent(fingerprint.navigator.userAgent)
 
@@ -48,10 +117,15 @@ async def NewPage(
             'deviceScaleFactor': fingerprint.screen.devicePixelRatio,
         },
     )
-    await page.setExtraHTTPHeaders(only_injectable_headers(fingerprint.headers, 'chrome'))
+    await page.setExtraHTTPHeaders(only_injectable_headers(fingerprint.headers, 'chromium'))
 
     # Only set to dark mode if the Chrome version >= 76
-    version = re.search('.*?/(\d+)[\d\.]+?', await browser.version())
+    if isinstance(obj, PBrowser):
+        ver = await obj.version()
+    else:
+        ver = await obj.browser.version()
+
+    version = re.search('.*?/(\d+)[\d\.]+?', ver)
     if version and int(version[1]) >= 76:
         await page._client.send(
             'Emulation.setEmulatedMedia',

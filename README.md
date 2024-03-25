@@ -485,36 +485,43 @@ fingerprint.generate(browser='chrome', os='windows')
 
 BrowserForge is fully compatible with your existing Playwright and Pyppeteer code. You only have to change your context/page initialization.
 
+
+To install BrowserForge's injector dependencies, run the following command:
+
+```
+pip install browserforge[injector]
+```
+
+You can now use the `browserforge.injectors` module to inject fingerprints into your browser context.
+
+
 ### Playwright
 
 #### Async API:
 
 ```py
 # Import the AsyncNewContext injector
-from browserforge.injectors.playwright import AsyncNewContext
+from browserforge.injectors.playwright import AsyncInjector
 
 async def main():
     async with async_playwright() as playwright:
-        browser = await playwright.chromium.launch()
+        browser = await AsyncInjector(playwright.chromium).launch()
         # Create a new async context with the injected fingerprint
-        context = await AsyncNewContext(browser, fingerprint=fingerprint)
+        context = await browser.new_context(fingerprint=fingerprint)
         page = await context.new_page()
         ...
 ```
 
-Replace `await browser.new_context` with `await AsyncNewContext` in your existing Playwright code.
+Replace `playwright.chromium` with `AsyncInjector(playwright.chromium)` in your existing Playwright code.
 
 <details>
-<summary>Parameters for AsyncNewContext</summary>
+<summary>Parameters for AsyncInjector</summary>
 
 ```
-Injects an async_api Playwright context with a Fingerprint.
+Launches a new injected browser.
 
 Parameters:
-    browser (Browser): The browser to create the context in
-    fingerprint (Optional[Fingerprint]): The fingerprint to inject. If None, one will be generated
-    fingerprint_options (Optional[Dict]): Options for the Fingerprint generator if `fingerprint` is not passed
-    **new_context_options: Other options for the new context
+    browser_type (BrowserType): The browser type to use. This can be firefox, chromium, or webkit.
 ```
 
 </details>
@@ -523,64 +530,55 @@ Parameters:
 
 ```py
 # Import the NewContext injector
-from browserforge.injectors.playwright import NewContext
+from browserforge.injectors.playwright import SyncInjector
 
 def main():
     with sync_playwright() as playwright:
-        browser = playwright.chromium.launch()
+        browser = SyncInjector(playwright.chromium).launch()
         # Create a new context with the injected fingerprint
-        context = NewContext(browser, fingerprint=fingerprint)
+        context = browser.new_context(fingerprint=fingerprint)
         page = context.new_page()
         ...
 ```
 
-Replace `browser.new_context` with `NewContext` in your existing Playwright code.
+Replace `playwright.chromium` with `SyncInjector(playwright.chromium)` in your existing Playwright code.
 
 <details>
-<summary>Parameters for NewContext</summary>
+<summary>Parameters for SyncInjector</summary>
 
 ```
-Injects a sync_api Playwright context with a Fingerprint.
+Launches a new injected browser.
 
 Parameters:
-    browser (Browser): The browser to create the context in
-    fingerprint (Optional[Fingerprint]): The fingerprint to inject. If None, one will be generated
-    fingerprint_options (Optional[Dict]): Options for the Fingerprint generator if `fingerprint` is not passed
-    **new_context_options: Other options for the new context
+    browser_type (BrowserType): The browser type to use. This can be firefox, chromium, or webkit.
 ```
 
 </details>
-
-#### Undetected-Playwright
-
-[Undetected-Playwright](https://github.com/kaliiiiiiiiii/undetected-playwright-python) is also supported in the `browserforge.injectors.undetected_playwright` package. The usage is the same as the Playwright injector.
 
 ### Pyppeteer
 
 ```py
 # Import the NewPage injector
-from browserforge.injectors.pyppeteer import NewPage
-from pyppeteer import launch
+from browserforge.injectors.pyppeteer import launch
 
 async def test():
-    browser = await launch()
-    # Create a new page with the injected fingerprint
-    page = await NewPage(browser, fingerprint=fingerprint)
+    # Create a new browser with the injected fingerprint
+    browser = await launch(fingerprint=fingerprint)
+    page = await browser.new_page()
     ...
 ```
 
-Replace `browser.newPage` with `NewPage` in your existing Pyppeteer code.
+Replace `launch` with `browserforge.injectors.pyppeteer:launch` in your existing Pyppeteer code.
 
 <details>
-<summary>Parameters for NewPage</summary>
+<summary>Parameters for launch</summary>
 
 ```
-Injects a Pyppeteer browser object with a Fingerprint.
-
 Parameters:
-    browser (Browser): The browser to create the context in
     fingerprint (Optional[Fingerprint]): The fingerprint to inject. If None, one will be generated
     fingerprint_options (Optional[Dict]): Options for the Fingerprint generator if `fingerprint` is not passed
+    *args: Arguments to pass to `pyppeteer.launch`
+    **kwargs: Keyword arguments to pass to `pyppeteer.launch`
 ```
 
 </details>
