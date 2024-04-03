@@ -1,12 +1,17 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple, TypeAlias, Union
+from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple, Union
 
 import orjson
-
 from browserforge.bayesian_network import BayesianNetwork, get_possible_values
 
 from .utils import get_browser, get_user_agent, pascalize_headers, tuplify
+
+try:
+    from typing import TypeAlias
+except ImportError:
+    from typing_extensions import TypeAlias  # < 3.10
+
 
 """Constants"""
 SUPPORTED_BROWSERS = ('chrome', 'firefox', 'safari', 'edge')

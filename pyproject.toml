@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "browserforge"
-version = "1.1.1"
+version = "1.1.2"
 description = "Intelligent browser header & fingerprint generator"
 authors = ["daijro <daijro.dev@gmail.com>"]
 license = "Apache-2.0"
@@ -34,3 +34,4 @@ rich = "*"
 aiofiles = "*"
 httpx = "*"
 orjson = "*"
+typing_extensions = {version = "*", python = "<3.10"}
