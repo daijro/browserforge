@@ -1,4 +1,8 @@
 import lzma
+import socket
+import subprocess
+import sys
+from base64 import b64encode
 from pathlib import Path
 from random import randrange
 from typing import Dict, Optional, Set
@@ -41,11 +45,15 @@ def only_injectable_headers(headers: Dict[str, str], browser_name: str) -> Dict[
 
 
 def InjectFunction(fingerprint: Fingerprint) -> str:
+    return InjectFunctionData(orjson.dumps(fingerprint).decode())
+
+
+def InjectFunctionData(fingerprint: str) -> str:
     return f"""
     (()=>{{
         {utils_js()}
 
-        const fp = {orjson.dumps(fingerprint).decode()};
+        const fp = {fingerprint};
         const {{
             battery,
             navigator: {{
@@ -59,9 +67,8 @@ def InjectFunction(fingerprint: Fingerprint) -> str:
             videoCodecs,
             mockWebRTC,
         }} = fp;
-        
+
         slim = fp.slim;
-        
         const historyLength = {randrange(1, 6)};
         
         const {{
@@ -140,10 +147,91 @@ def _fingerprint(
     return generator.generate(**(fingerprint_options or {}))
 
 
-def CheckIfInstalled(module_name: str):
+def NewPort() -> str:
+    tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    tcp.bind(('', 0))
+    return str(tcp.getsockname()[1])
+
+
+def WorkerBootstrap(data: str, browser_name: str) -> str:
     """
-    Checks if a module is installed
+    Builds the bootstrap script for service workers
+    """
+    return f"""
+    if (typeof WorkerGlobalScope !== 'undefined' && typeof self.navigator !== 'undefined') {{
+        let navigatorData = {data};
+        Object.keys(navigatorData).forEach(function(key) {{
+            // Firefox does not support "deviceMemory"
+            if (key === 'deviceMemory' && "{browser_name}" !== "chromium") {{ return; }}
+            Object.defineProperty(self.navigator, key, {{ get: () => navigatorData[key] }});
+        }});
+    }};
+    """
+
+
+class MitmProxy:
+    def __init__(
+        self,
+        fingerprint: Fingerprint,
+        upstream_proxy: Optional[Dict[str, str]] = None,
+        browser_name: str = 'chromium',
+    ):
+        if upstream_proxy:
+            raise NotImplementedError('Proxies are not supported yet')
+        self.fingerprint = fingerprint
+        self.browser_name = browser_name
+        self.process: Optional[subprocess.Popen] = None
+        self._server: Optional[str] = None
+
+    @property
+    def server(self):
+        if self._server is None:
+            self.launch()
+        return self._server
+
+    def __enter__(self):
+        self.launch()
+        return self
+
+    def __exit__(self):
+        self.close()
+
+    def close(self) -> None:
+        if self.process is not None:
+            self.process.kill()
+
+    def launch(self) -> str:
+        """
+        Launches the mitm server
+        """
+        bootstrap = WorkerBootstrap(
+            data=orjson.dumps(self.fingerprint.navigator).decode(),
+            browser_name=self.browser_name,
+        )
+        port = NewPort()
+        # Launch mitm.py with the bootstrap payload and new server port
+        # trunk-ignore(bandit/B603)
+        self.process = subprocess.Popen(
+            [
+                sys.executable,
+                str(Path(__file__).parent / 'mitm.py'),
+                '--port',
+                port,
+                '--bootstrap',
+                b64encode(bootstrap.encode()).decode(),
+            ],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        self._server = f'http://localhost:{port}'
+        return self._server
+
+
+def NotInstalled(*module_names):
+    """
+    Checks if any passed module name is not installed
     """
     import importlib.util
 
-    return importlib.util.find_spec(module_name) is not None
+    return any(importlib.util.find_spec(name) is None for name in module_names)

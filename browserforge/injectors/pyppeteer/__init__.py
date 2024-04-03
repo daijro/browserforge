@@ -1,5 +1,8 @@
-from browserforge.injectors.utils import CheckIfInstalled
+from browserforge.injectors.utils import NotInstalled
 
-CheckIfInstalled('pyppeteer')
+if NotInstalled('pyppeteer', 'mitmproxy'):
+    raise ImportError(
+        'Please install all injection dependencies: `pip install browserforge[pyppeteer]`'
+    )
 
-from .injector import NewPage
+from .injector import NewPage, launch
