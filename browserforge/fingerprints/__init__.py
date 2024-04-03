@@ -1,6 +1,6 @@
-from browserforge.download import DownloadIfNotExists
+from browserforge.download import download_if_not_exists
 
-DownloadIfNotExists()
+download_if_not_exists(fingerprints=True)
 
 from browserforge.headers import Browser
 
