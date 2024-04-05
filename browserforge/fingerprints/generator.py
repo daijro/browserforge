@@ -111,7 +111,7 @@ class Screen:
 class FingerprintGenerator:
     """Generates realistic browser fingerprints"""
 
-    fingerprint_generator_network = BayesianNetwork(DATA_DIR / "fingerprint-network.json")
+    fingerprint_generator_network = BayesianNetwork(DATA_DIR / "fingerprint-network.zip")
 
     def __init__(
         self,
