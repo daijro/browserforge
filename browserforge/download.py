@@ -6,7 +6,6 @@ from typing import Dict, Iterator
 import click
 import httpx
 
-
 """
 Downloads the required model definitions
 """
@@ -45,28 +44,27 @@ class DataDownloader:
     Download and extract data files for both headers and fingerprints.
     """
 
+    def __init__(self, **kwargs: bool) -> None:
+        self.options = _enabled_flags(kwargs)
+
     def download_file(self, url: str, path: str) -> None:
         """
         Download a file from the specified URL and save it to the given path.
         """
         with httpx.Client(follow_redirects=True) as client:
             resp = client.get(url)
-            if resp.status_code == 200:
-                with open(path, "wb") as f:
-                    f.write(resp.content)
-            else:
-                raise Exception(f"Download failed with status code: {resp.status_code}")
+            if not resp.is_success:
+                raise DownloadException(f"Download failed with status code: {resp.status_code}")
+            with open(path, "wb") as f:
+                f.write(resp.content)
 
-    def download(self, **kwargs) -> None:
+    def download(self) -> None:
         """
         Download and extract data files for both headers and fingerprints.
         """
         futures = {}
         with ThreadPoolExecutor(10) as executor:
-            for data_type, enabled in kwargs.items():
-                if not enabled:
-                    # if the option is marked as False, ignore
-                    continue
+            for data_type in self.options:
                 for local_name, remote_name in DATA_FILES[data_type].items():
                     url = f"{REMOTE_PATHS[data_type]}/{remote_name}"
                     path = str(DATA_DIRS[data_type] / local_name)
@@ -80,51 +78,69 @@ class DataDownloader:
                     click.secho(f"Error downloading {local_name}: {e}", fg="red")
 
 
-def download(headers=True, fingerprints=True) -> None:
-    try:
-        DataDownloader().download(headers=headers, fingerprints=fingerprints)
-    except KeyboardInterrupt:
-        print("Download interrupted.")
-        remove()
-        exit()
+def _enabled_flags(flags: Dict[str, bool]) -> Iterator[str]:
+    """
+    Returns a list of enabled flags based on a given dictionary
+    """
+    for flag, enabled in flags.items():
+        if enabled:
+            yield flag
 
 
-def download_if_not_exists(headers: bool = False, fingerprints: bool = False) -> None:
-    if not is_downloaded(headers=headers, fingerprints=fingerprints):
-        download(headers=headers, fingerprints=fingerprints)
-
-
-def get_all_paths(headers=False, fingerprints=False) -> Iterator[Path]:
+def _get_all_paths(**flags: bool) -> Iterator[Path]:
     """
     Yields all the paths to the downloaded data files
     """
-    for data_type, data_path in DATA_DIRS.items():
-        if (headers and data_type == "headers") or (
-            fingerprints and data_type == "fingerprints"
-        ):
-            for local_name, remote_name in DATA_FILES[data_type].items():
-                yield data_path / local_name
+    for data_type in _enabled_flags(flags):
+        data_path = DATA_DIRS[data_type]
+        for local_name, _ in DATA_FILES[data_type].items():
+            yield data_path / local_name
 
 
-def is_downloaded(headers=False, fingerprints=False) -> bool:
+"""
+Public download functions
+"""
+
+
+def download(headers=False, fingerprints=False) -> None:
+    """
+    Download the required data files
+    """
+    # Announce that files are being downloaded
+    click.secho('Downloading model definition files...', fg='bright_yellow')
+    try:
+        DataDownloader(headers=headers, fingerprints=fingerprints).download()
+    except KeyboardInterrupt:
+        print("Download interrupted.")
+        remove_files()
+        exit()
+
+
+def download_if_not_exists(**flags: bool) -> None:
+    """
+    Download the required data files if they don't exist
+    """
+    if not is_downloaded(**flags):
+        download(**flags)
+
+
+def is_downloaded(**flags: bool) -> bool:
     """
     Check if the required data files are already downloaded and not older than a week.
     Returns True if all the requested data files are present and not older than a week, False otherwise.
     """
-    for path in get_all_paths(headers=headers, fingerprints=fingerprints):
+    for path in _get_all_paths(**flags):
         if not path.exists():
             return False
     # Check if the file is older than a week
     file_creation_time = datetime.fromtimestamp(path.stat().st_ctime)
     one_week_ago = datetime.now() - timedelta(weeks=1)
-    if file_creation_time < one_week_ago:
-        return False
-    return True
+    return file_creation_time >= one_week_ago
 
 
-def remove() -> None:
+def remove_files() -> None:
     """
     Deletes all downloaded data files
     """
-    for path in get_all_paths(headers=True, fingerprints=True):
+    for path in _get_all_paths(headers=True, fingerprints=True):
         path.unlink(missing_ok=True)

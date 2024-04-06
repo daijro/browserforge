@@ -1,6 +1,6 @@
 import click
 
-from browserforge.download import download, remove
+from browserforge.download import download, remove_files
 
 
 class DownloadException(Exception):
@@ -12,11 +12,9 @@ def cli() -> None:
     pass
 
 
-@cli.command(name="update")
-@click.option("--headers", is_flag=True, help="Only update header definitions")
-@click.option(
-    "--fingerprints", is_flag=True, help="Only update fingerprint definitions"
-)
+@cli.command(name='update')
+@click.option('--headers', is_flag=True, help='Only update header definitions')
+@click.option('--fingerprints', is_flag=True, help='Only update fingerprint definitions')
 def update(headers=False, fingerprints=False):
     """
     Fetches header and fingerprint definitions
@@ -25,20 +23,17 @@ def update(headers=False, fingerprints=False):
     if not headers ^ fingerprints:
         headers = fingerprints = True
 
-    click.secho("Downloading model definition files...", fg="green")
-
     download(headers=headers, fingerprints=fingerprints)
-    click.secho("Complete!", fg="green")
 
 
-@cli.command(name="remove")
+@cli.command(name='remove')
 def remove():
     """
     Remove all downloaded files
     """
-    remove()
-    click.secho("Removed all files!", fg="green")
+    remove_files()
+    click.secho('Removed all files!', fg='bright_yellow')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     cli()

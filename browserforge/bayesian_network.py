@@ -9,34 +9,6 @@ T = TypeVar('T')
 Map = Union[list, tuple]
 
 
-def unzip_and_load_json(path: Path) -> dict:
-    """
-    Unzips a zip file if the path points to a zip file, otherwise directly loads a JSON file.
-    
-    Parameters:
-    - path: The path to the zip file or JSON file.
-    
-    Returns:
-    - A dictionary representing the JSON content.
-    """
-    network_definition = {}
-    
-    if path.suffix == '.zip':
-        # Unzip the file and load the JSON content
-        with zipfile.ZipFile(path, 'r') as z:
-            for filename in z.namelist():
-                if filename.endswith('.json'):
-                    with z.open(filename) as file:
-                        network_definition = orjson.loads(file.read())
-                        break # Assuming only one JSON file is needed
-    else:
-        # Directly load the JSON file
-        with open(path, 'rb') as file:
-            network_definition = orjson.loads(file.read())
-    
-    return network_definition
-
-
 class BayesianNode:
     """
     Implementation of a single node in a bayesian network allowing sampling from its conditional distribution
@@ -125,7 +97,7 @@ class BayesianNetwork:
     """
 
     def __init__(self, path: Path) -> None:
-        network_definition = unzip_and_load_json(path)
+        network_definition = extract_json(path)
         self.nodes_in_sampling_order = [
             BayesianNode(node_def) for node_def in network_definition['nodes']
         ]
@@ -293,3 +265,30 @@ def get_possible_values(
                 result[key] = set_dict[key]
 
     return result
+
+
+def extract_json(path: Path) -> dict:
+    """
+    Unzips a zip file if the path points to a zip file, otherwise directly loads a JSON file.
+
+    Parameters:
+        path: The path to the zip file or JSON file.
+
+    Returns:
+        A dictionary representing the JSON content.
+    """
+    network_definition = {}
+
+    if path.suffix != '.zip':
+        # Directly load the JSON file
+        with open(path, 'rb') as file:
+            return orjson.loads(file.read())
+    # Unzip the file and load the JSON content
+    with zipfile.ZipFile(path, 'r') as zf:
+        for filename in zf.namelist():
+            if filename.endswith('.json'):
+                with zf.open(filename) as file:
+                    network_definition = orjson.loads(file.read())
+                    break  # Assuming only one JSON file is needed
+
+    return network_definition
