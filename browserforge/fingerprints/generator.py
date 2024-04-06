@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -8,8 +8,12 @@ from browserforge.headers.utils import get_user_agent
 
 try:
     import orjson as json
+
+    USE_ORJSON = True
 except ImportError:
     import json
+
+    USE_ORJSON = False
 
 DATA_DIR: Path = Path(__file__).parent / 'data'
 
@@ -82,6 +86,16 @@ class Fingerprint:
     fonts: List[str]
     mockWebRTC: Optional[bool]
     slim: Optional[bool]
+
+    def dumps(self) -> str:
+        """
+        Dumps the dataclass as a JSON string.
+        """
+        if USE_ORJSON:
+            return json.dumps(self).decode()
+        # Built-in `json` does not take dataclass objects
+        # Instead, convert to a dict first
+        return json.dumps(asdict(self))
 
 
 @dataclass

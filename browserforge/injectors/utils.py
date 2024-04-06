@@ -1,4 +1,3 @@
-import json
 import lzma
 from pathlib import Path
 from random import randrange
@@ -44,7 +43,7 @@ def InjectFunction(fingerprint: Fingerprint) -> str:
     (()=>{{
         {utils_js()}
 
-        const fp = {json.dumps(fingerprint)};
+        const fp = {fingerprint.dumps()};
         const {{
             battery,
             navigator: {{
