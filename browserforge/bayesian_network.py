@@ -1,4 +1,5 @@
 import random
+import zipfile
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, TypeVar, Union
 
@@ -6,6 +7,34 @@ import orjson
 
 T = TypeVar('T')
 Map = Union[list, tuple]
+
+
+def unzip_and_load_json(path: Path) -> dict:
+    """
+    Unzips a zip file if the path points to a zip file, otherwise directly loads a JSON file.
+    
+    Parameters:
+    - path: The path to the zip file or JSON file.
+    
+    Returns:
+    - A dictionary representing the JSON content.
+    """
+    network_definition = {}
+    
+    if path.suffix == '.zip':
+        # Unzip the file and load the JSON content
+        with zipfile.ZipFile(path, 'r') as z:
+            for filename in z.namelist():
+                if filename.endswith('.json'):
+                    with z.open(filename) as file:
+                        network_definition = orjson.loads(file.read())
+                        break # Assuming only one JSON file is needed
+    else:
+        # Directly load the JSON file
+        with open(path, 'rb') as file:
+            network_definition = orjson.loads(file.read())
+    
+    return network_definition
 
 
 class BayesianNode:
@@ -96,8 +125,7 @@ class BayesianNetwork:
     """
 
     def __init__(self, path: Path) -> None:
-        with open(path, 'rb') as file:
-            network_definition = orjson.loads(file.read())
+        network_definition = unzip_and_load_json(path)
         self.nodes_in_sampling_order = [
             BayesianNode(node_def) for node_def in network_definition['nodes']
         ]

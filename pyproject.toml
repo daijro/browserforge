@@ -30,8 +30,6 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.8"
 click = "*"
-rich = "*"
-aiofiles = "*"
 httpx = "*"
 orjson = "*"
 typing_extensions = {version = "*", python = "<3.10"}

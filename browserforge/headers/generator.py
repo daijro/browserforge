@@ -79,8 +79,8 @@ class HeaderGenerator:
     relaxation_order: Tuple[str, ...] = ('locales', 'devices', 'operatingSystems', 'browsers')
 
     # Initialize networks
-    input_generator_network = BayesianNetwork(DATA_DIR / "input-network.json")
-    header_generator_network = BayesianNetwork(DATA_DIR / "header-network.json")
+    input_generator_network = BayesianNetwork(DATA_DIR / "input-network.zip")
+    header_generator_network = BayesianNetwork(DATA_DIR / "header-network.zip")
 
     def __init__(
         self,
