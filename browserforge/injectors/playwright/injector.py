@@ -96,5 +96,6 @@ def _context_options(
             'accept-language': fingerprint.headers['Accept-Language'],
             **options.pop('extra_http_headers', {}),
         },
+        'device_scale_factor': fingerprint.screen.devicePixelRatio,
         **options,
     }
