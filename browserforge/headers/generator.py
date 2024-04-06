@@ -2,10 +2,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple, Union
 
-import orjson
 from browserforge.bayesian_network import BayesianNetwork, get_possible_values
 
 from .utils import get_browser, get_user_agent, pascalize_headers, tuplify
+
+try:
+    import orjson as json
+except ImportError:
+    import json
 
 try:
     from typing import TypeAlias
@@ -430,7 +434,7 @@ class HeaderGenerator:
             Dict[str, List[str]]: Dictionary of headers order for each browser.
         """
         headers_order_path = DATA_DIR / "headers-order.json"
-        return orjson.loads(headers_order_path.read_bytes())
+        return json.loads(headers_order_path.read_bytes())
 
     def _load_unique_browsers(self) -> List[HttpBrowserObject]:
         """
@@ -440,7 +444,7 @@ class HeaderGenerator:
             List[HttpBrowserObject]: List of HttpBrowserObject instances.
         """
         browser_helper_path = DATA_DIR / 'browser-helper-file.json'
-        unique_browser_strings = orjson.loads(browser_helper_path.read_bytes())
+        unique_browser_strings = json.loads(browser_helper_path.read_bytes())
         return [
             self._prepare_http_browser_object(browser_str)
             for browser_str in unique_browser_strings

@@ -2,11 +2,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional
 
-import orjson
-
 from browserforge.bayesian_network import BayesianNetwork, get_possible_values
 from browserforge.headers import HeaderGenerator
 from browserforge.headers.utils import get_user_agent
+
+try:
+    import orjson as json
+except ImportError:
+    import json
 
 DATA_DIR: Path = Path(__file__).parent / 'data'
 
@@ -207,9 +210,7 @@ class FingerprintGenerator:
             if isinstance(fingerprint[attribute], str) and fingerprint[attribute].startswith(
                 '*STRINGIFIED*'
             ):
-                fingerprint[attribute] = orjson.loads(
-                    fingerprint[attribute][len('*STRINGIFIED*') :]
-                )
+                fingerprint[attribute] = json.loads(fingerprint[attribute][len('*STRINGIFIED*') :])
 
         # Manually add the set of accepted languages required by the input
         accept_language_header_value = headers.get('Accept-Language', '')
@@ -271,7 +272,7 @@ class FingerprintGenerator:
         Returns:
             bool: True if the screen dimensions are within the constraints, False otherwise.
         """
-        screen = orjson.loads(screen_string[len('*STRINGIFIED*') :])
+        screen = json.loads(screen_string[len('*STRINGIFIED*') :])
         return (
             screen['width'] >= (screen_options.min_width or 0)
             and screen['width'] <= (screen_options.max_width or 1e5)

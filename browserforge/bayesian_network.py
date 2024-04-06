@@ -3,7 +3,10 @@ import zipfile
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, TypeVar, Union
 
-import orjson
+try:
+    import orjson as json
+except ImportError:
+    import json
 
 T = TypeVar('T')
 Map = Union[list, tuple]
@@ -277,18 +280,17 @@ def extract_json(path: Path) -> dict:
     Returns:
         A dictionary representing the JSON content.
     """
-    network_definition = {}
-
     if path.suffix != '.zip':
         # Directly load the JSON file
         with open(path, 'rb') as file:
-            return orjson.loads(file.read())
+            return json.loads(file.read())
     # Unzip the file and load the JSON content
     with zipfile.ZipFile(path, 'r') as zf:
-        for filename in zf.namelist():
-            if filename.endswith('.json'):
-                with zf.open(filename) as file:
-                    network_definition = orjson.loads(file.read())
-                    break  # Assuming only one JSON file is needed
-
-    return network_definition
+        # Find the first JSON file in zip
+        try:
+            filename = next(file for file in zf.namelist() if file.endswith('.json'))
+        except StopIteration:
+            return {}  # Broken
+        with zf.open(filename) as f:
+            # Assuming only one JSON file is needed
+            return json.loads(f.read())

@@ -1,9 +1,8 @@
+import json
 import lzma
 from pathlib import Path
 from random import randrange
 from typing import Dict, Optional, Set
-
-import orjson
 
 from browserforge.fingerprints import Fingerprint, FingerprintGenerator
 
@@ -45,7 +44,7 @@ def InjectFunction(fingerprint: Fingerprint) -> str:
     (()=>{{
         {utils_js()}
 
-        const fp = {orjson.dumps(fingerprint).decode()};
+        const fp = {json.dumps(fingerprint)};
         const {{
             battery,
             navigator: {{

@@ -49,11 +49,13 @@ It is a reimplementation of [Apify's fingerprint-suite](https://github.com/apify
 ## Installation
 
 ```
-pip install browserforge
+pip install browserforge[all]
 python -m browserforge update
 ```
 
-**Note:** The `browserforge update` command is needed to download model definitions. If the command is not run, files will be downloaded on the first import.
+The `[all]` extra will include optional libraries like orjson.
+
+Use `python -m browserforge update` to fetch necessary model files. If the command is not run, files will be downloaded on the first import.
 
 <hr width=50>
 
