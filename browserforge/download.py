@@ -1,10 +1,11 @@
+import shutil
+import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, Iterator
 
 import click
-import httpx
 
 """
 Downloads the required model definitions
@@ -51,12 +52,11 @@ class DataDownloader:
         """
         Download a file from the specified URL and save it to the given path.
         """
-        with httpx.Client(follow_redirects=True) as client:
-            resp = client.get(url)
-            if not resp.is_success:
-                raise DownloadException(f"Download failed with status code: {resp.status_code}")
+        with urllib.request.urlopen(url) as resp:  # nosec
+            if resp.status != 200:
+                raise DownloadException(f"Download failed with status code: {resp.status}")
             with open(path, "wb") as f:
-                f.write(resp.content)
+                shutil.copyfileobj(resp, f)
 
     def download(self) -> None:
         """
