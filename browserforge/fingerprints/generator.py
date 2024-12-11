@@ -288,10 +288,10 @@ class FingerprintGenerator:
         """
         screen = json.loads(screen_string[len('*STRINGIFIED*') :])
         return (
-            screen['width'] >= (screen_options.min_width or 0)
-            and screen['width'] <= (screen_options.max_width or 1e5)
-            and screen['height'] >= (screen_options.min_height or 0)
-            and screen['height'] <= (screen_options.max_height or 1e5)
+            screen.get('width', 0) >= (screen_options.min_width or 0)
+            and screen.get('width', 0) <= (screen_options.max_width or 1e5)
+            and screen.get('height', 0) >= (screen_options.min_height or 0)
+            and screen.get('height', 0) <= (screen_options.max_height or 1e5)
         )
 
     @staticmethod
