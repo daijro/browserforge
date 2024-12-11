@@ -1,5 +1,10 @@
-from browserforge.download import download_if_not_exists
+from browserforge.download import DownloadIfNotExists
 
-download_if_not_exists(headers=True)
+DownloadIfNotExists(headers=True)
 
 from .generator import Browser, HeaderGenerator
+
+__all__ = [
+    "Browser",
+    "HeaderGenerator",
+]

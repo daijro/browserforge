@@ -31,8 +31,8 @@ DATA_FILES: Dict[str, Dict[str, str]] = {
     },
 }
 REMOTE_PATHS: Dict[str, str] = {
-    "headers": "https://github.com/apify/fingerprint-suite/raw/master/packages/header-generator/src/data_files",
-    "fingerprints": "https://github.com/apify/fingerprint-suite/raw/master/packages/fingerprint-generator/src/data_files",
+    "headers": "https://github.com/apify/fingerprint-suite/raw/refs/tags/v2.1.58/packages/header-generator/src/data_files",
+    "fingerprints": "https://github.com/apify/fingerprint-suite/raw/refs/tags/v2.1.58/packages/fingerprint-generator/src/data_files",
 }
 
 
@@ -102,7 +102,7 @@ Public download functions
 """
 
 
-def download(headers=False, fingerprints=False) -> None:
+def Download(headers=False, fingerprints=False) -> None:
     """
     Download the required data files
     """
@@ -112,33 +112,36 @@ def download(headers=False, fingerprints=False) -> None:
         DataDownloader(headers=headers, fingerprints=fingerprints).download()
     except KeyboardInterrupt:
         print("Download interrupted.")
-        remove_files()
+        Remove()
         exit()
 
 
-def download_if_not_exists(**flags: bool) -> None:
+def DownloadIfNotExists(**flags: bool) -> None:
     """
     Download the required data files if they don't exist
     """
-    if not is_downloaded(**flags):
-        download(**flags)
+    if not IsDownloaded(**flags):
+        Download(**flags)
 
 
-def is_downloaded(**flags: bool) -> bool:
+def IsDownloaded(**flags: bool) -> bool:
     """
-    Check if the required data files are already downloaded and not older than a week.
-    Returns True if all the requested data files are present and not older than a week, False otherwise.
+    Check if the required data files are already downloaded and not older than a month.
+    Returns True if all the requested data files are present and not older than a month, False otherwise.
     """
     for path in _get_all_paths(**flags):
         if not path.exists():
             return False
-    # Check if the file is older than a week
-    file_creation_time = datetime.fromtimestamp(path.stat().st_ctime)
-    one_week_ago = datetime.now() - timedelta(weeks=1)
-    return file_creation_time >= one_week_ago
+    # Check if the file is older than a month
+
+    # As of BrowserForge 1.2.1, this is not needed as it is frozen to v2.1.58
+    # file_creation_time = datetime.fromtimestamp(path.stat().st_ctime)
+    # one_month_ago = datetime.now() - timedelta(weeks=5)
+    # return file_creation_time >= one_month_ago
+    return True
 
 
-def remove_files() -> None:
+def Remove() -> None:
     """
     Deletes all downloaded data files
     """

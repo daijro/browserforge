@@ -286,13 +286,19 @@ class FingerprintGenerator:
         Returns:
             bool: True if the screen dimensions are within the constraints, False otherwise.
         """
-        screen = json.loads(screen_string[len('*STRINGIFIED*') :])
-        return (
-            screen['width'] >= (screen_options.min_width or 0)
-            and screen['width'] <= (screen_options.max_width or 1e5)
-            and screen['height'] >= (screen_options.min_height or 0)
-            and screen['height'] <= (screen_options.max_height or 1e5)
-        )
+        try:
+            screen = json.loads(screen_string[len('*STRINGIFIED*') :])
+            return (
+                # Ensure that the screen width/height are greater than the minimum constraints
+                # Default missing values to -1 to ensure they are excluded
+                screen.get('width', -1) >= (screen_options.min_width or 0)
+                and screen.get('height', -1) >= (screen_options.min_height or 0)
+                # Ensure that the screen width/height are less than the maximum constraints
+                and screen.get('width', 0) <= (screen_options.max_width or 1e5)
+                and screen.get('height', 0) <= (screen_options.max_height or 1e5)
+            )
+        except (ValueError, TypeError):
+            return False
 
     @staticmethod
     def _transform_fingerprint(

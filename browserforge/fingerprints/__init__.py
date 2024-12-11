@@ -1,6 +1,6 @@
-from browserforge.download import download_if_not_exists
+from browserforge.download import DownloadIfNotExists
 
-download_if_not_exists(fingerprints=True, headers=True)
+DownloadIfNotExists(fingerprints=True, headers=True)
 
 from browserforge.headers import Browser
 
@@ -12,3 +12,13 @@ from .generator import (
     ScreenFingerprint,
     VideoCard,
 )
+
+__all__ = [
+    "Browser",
+    "Fingerprint",
+    "FingerprintGenerator",
+    "NavigatorFingerprint",
+    "Screen",
+    "ScreenFingerprint",
+    "VideoCard",
+]

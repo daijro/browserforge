@@ -1,6 +1,6 @@
 import click
 
-from browserforge.download import download, remove_files
+from browserforge.download import Download, Remove
 
 
 class DownloadException(Exception):
@@ -23,7 +23,7 @@ def update(headers=False, fingerprints=False):
     if not headers ^ fingerprints:
         headers = fingerprints = True
 
-    download(headers=headers, fingerprints=fingerprints)
+    Download(headers=headers, fingerprints=fingerprints)
 
 
 @cli.command(name='remove')
@@ -31,7 +31,7 @@ def remove():
     """
     Remove all downloaded files
     """
-    remove_files()
+    Remove()
     click.secho('Removed all files!', fg='bright_yellow')
 
 
