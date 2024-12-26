@@ -1,7 +1,8 @@
 import random
 import zipfile
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, TypeVar, Union
+from typing import (Any, Dict, Iterable, List, Optional, Sequence, Tuple,
+                    TypeVar, Union)
 
 try:
     import orjson as json
@@ -13,19 +14,13 @@ Map = Union[list, tuple]
 
 
 class BayesianNode:
-    """
-    Implementation of a single node in a bayesian network allowing sampling from its conditional distribution
-    """
+    """Implementation of a single node in a bayesian network allowing sampling from its conditional distribution."""
 
     def __init__(self, node_definition: Dict[str, Any]):
         self.node_definition = node_definition
 
-    def get_probabilities_given_known_values(
-        self, parent_values: Dict[str, Any]
-    ) -> Dict[Any, float]:
-        """
-        Extracts unconditional probabilities of node values given the values of the parent nodes
-        """
+    def get_probabilities_given_known_values(self, parent_values: Dict[str, Any]) -> Dict[Any, float]:
+        """Extracts unconditional probabilities of node values given the values of the parent nodes."""
         probabilities = self.node_definition['conditionalProbabilities']
         for parent_name in self.parent_names:
             parent_value = parent_values.get(parent_name)
@@ -35,12 +30,11 @@ class BayesianNode:
                 probabilities = probabilities.get('skip', {})
         return probabilities
 
+    # noinspection PyMethodMayBeStatic
     def sample_random_value_from_possibilities(
         self, possible_values: List[str], probabilities: Dict[str, float]
     ) -> Any:
-        """
-        Randomly samples from the given values using the given probabilities
-        """
+        """Randomly samples from the given values using the given probabilities."""
         # Python natively supports weighted random sampling in random.choices,
         # but this method is much faster
         anchor = random.random()
@@ -53,13 +47,9 @@ class BayesianNode:
         return possible_values[0]
 
     def sample(self, parent_values: Dict[str, Any]) -> Any:
-        """
-        Randomly samples from the conditional distribution of this node given values of parents
-        """
+        """Randomly samples from the conditional distribution of this node given values of parents."""
         probabilities = self.get_probabilities_given_known_values(parent_values)
-        return self.sample_random_value_from_possibilities(
-            list(probabilities.keys()), probabilities
-        )
+        return self.sample_random_value_from_possibilities(list(probabilities.keys()), probabilities)
 
     def sample_according_to_restrictions(
         self,
@@ -67,15 +57,10 @@ class BayesianNode:
         value_possibilities: Iterable[str],
         banned_values: List[str],
     ) -> Optional[str]:
-        """
-        Randomly samples from the conditional distribution of this node given restrictions on the possible values and the values of the parents.
-        """
+        """Randomly samples from the conditional distribution of this node given restrictions on the possible values and
+        the values of the parents."""
         probabilities = self.get_probabilities_given_known_values(parent_values)
-        valid_values = [
-            value
-            for value in value_possibilities
-            if value not in banned_values and value in probabilities
-        ]
+        valid_values = [value for value in value_possibilities if value not in banned_values and value in probabilities]
         if valid_values:
             return self.sample_random_value_from_possibilities(valid_values, probabilities)
         else:
@@ -95,21 +80,15 @@ class BayesianNode:
 
 
 class BayesianNetwork:
-    """
-    Implementation of a bayesian network capable of randomly sampling from its distribution
-    """
+    """Implementation of a bayesian network capable of randomly sampling from its distribution."""
 
     def __init__(self, path: Path) -> None:
         network_definition = extract_json(path)
-        self.nodes_in_sampling_order = [
-            BayesianNode(node_def) for node_def in network_definition['nodes']
-        ]
+        self.nodes_in_sampling_order = [BayesianNode(node_def) for node_def in network_definition['nodes']]
         self.nodes_by_name = {node.name: node for node in self.nodes_in_sampling_order}
 
     def generate_sample(self, input_values: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """
-        Randomly samples from the distribution represented by the bayesian network.
-        """
+        """Randomly samples from the distribution represented by the bayesian network."""
         if input_values is None:
             input_values = {}
         sample = input_values.copy()
@@ -121,9 +100,9 @@ class BayesianNetwork:
     def generate_consistent_sample_when_possible(
         self, value_possibilities: Dict[str, Iterable[str]]
     ) -> Optional[Dict[str, Any]]:
-        """
-        Randomly samples values from the distribution represented by the bayesian network,
-        making sure the sample is consistent with the provided restrictions on value possibilities.
+        """Randomly samples values from the distribution represented by the bayesian network, making sure the sample is
+        consistent with the provided restrictions on value possibilities.
+
         Returns None if no such sample can be generated.
         """
         return self.recursively_generate_consistent_sample_when_possible({}, value_possibilities, 0)
@@ -134,9 +113,7 @@ class BayesianNetwork:
         value_possibilities: Dict[str, Iterable[str]],
         depth: int,
     ) -> Optional[Dict[str, Any]]:
-        """
-        Recursively generates a random sample consistent with the given restrictions on possible values.
-        """
+        """Recursively generates a random sample consistent with the given restrictions on possible values."""
         if depth == len(self.nodes_in_sampling_order):
             return sample_so_far
         node = self.nodes_in_sampling_order[depth]
@@ -162,29 +139,24 @@ class BayesianNetwork:
 
 
 def array_intersection(a: Sequence[T], b: Sequence[T]) -> List[T]:
-    """
-    Performs a set "intersection" on the given (flat) arrays
-    """
+    """Performs a set "intersection" on the given (flat) arrays."""
     set_b = set(b)
     return [x for x in a if x in set_b]
 
 
 def array_zip(a: List[Tuple[T, ...]], b: List[Tuple[T, ...]]) -> List[Tuple[T, ...]]:
-    """
-    Combines two arrays into a single array using the set union
+    """Combines two arrays into a single array using the set union
     Args:
         a: First array to be combined.
         b: Second array to be combined.
     Returns:
-        Zipped (multi-dimensional) array.
+        Zipped (multidimensional) array.
     """
     return [tuple(set(x).union(y)) for x, y in zip(a, b)]
 
 
 def undeeper(obj: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Removes the "deeper/skip" structures from the conditional probability table
-    """
+    """Removes the "deeper/skip" structures from the conditional probability table."""
     if not isinstance(obj, dict):
         return obj
     result: Dict[str, Any] = {}
@@ -199,8 +171,7 @@ def undeeper(obj: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def filter_by_last_level_keys(tree: Dict[str, Any], valid_keys: Map) -> List[Tuple[str, ...]]:
-    r"""
-    Performs DFS on the Tree and returns values of the nodes on the paths that end with the given keys
+    r"""Performs DFS on the Tree and returns values of the nodes on the paths that end with the given keys
     (stored by levels - first level is the root)
     ```
        1
@@ -218,11 +189,7 @@ def filter_by_last_level_keys(tree: Dict[str, Any], valid_keys: Map) -> List[Tup
             if not isinstance(t[key], dict) or t[key] is None:
                 if key in vk:
                     nonlocal out
-                    out = (
-                        [(x,) for x in acc]
-                        if len(out) == 0
-                        else array_zip(out, [(x,) for x in acc])
-                    )
+                    out = [(x,) for x in acc] if len(out) == 0 else array_zip(out, [(x,) for x in acc])
                 continue
             else:
                 recurse(t[key], vk, acc + [key])
@@ -234,10 +201,8 @@ def filter_by_last_level_keys(tree: Dict[str, Any], valid_keys: Map) -> List[Tup
 def get_possible_values(
     network: 'BayesianNetwork', possible_values: Dict[str, Union[Tuple[str, ...], List[str]]]
 ) -> Dict[str, Sequence[str]]:
-    """
-    Given a `generative-bayesian-network` instance and a set of user constraints, returns an extended
-    set of constraints **induced** by the original constraints and network structure
-    """
+    """Given a `generative-bayesian-network` instance and a set of user constraints, returns an extended set of
+    constraints **induced** by the original constraints and network structure."""
 
     sets = []
     # For every pre-specified node, compute the "closure" for values of the other nodes
@@ -271,8 +236,7 @@ def get_possible_values(
 
 
 def extract_json(path: Path) -> dict:
-    """
-    Unzips a zip file if the path points to a zip file, otherwise directly loads a JSON file.
+    """Unzips a zip file if the path points to a zip file, otherwise directly loads a JSON file.
 
     Parameters:
         path: The path to the zip file or JSON file.

@@ -72,7 +72,7 @@ class VideoCard:
 
 @dataclass
 class Fingerprint:
-    """Output data of the fingerprint generator"""
+    """Output data of the fingerprint generator."""
 
     screen: ScreenFingerprint
     navigator: NavigatorFingerprint
@@ -88,9 +88,7 @@ class Fingerprint:
     slim: Optional[bool]
 
     def dumps(self) -> str:
-        """
-        Dumps the dataclass as a JSON string.
-        """
+        """Dumps the dataclass as a JSON string."""
         if USE_ORJSON:
             return json.dumps(self).decode()
         # Built-in `json` does not take dataclass objects
@@ -100,7 +98,7 @@ class Fingerprint:
 
 @dataclass
 class Screen:
-    """Constrains the screen dimensions of the generated fingerprint"""
+    """Constrains the screen dimensions of the generated fingerprint."""
 
     min_width: Optional[int] = None
     max_width: Optional[int] = None
@@ -114,19 +112,15 @@ class Screen:
             or None not in (self.min_height, self.max_height)
             and self.min_height > self.max_height
         ):
-            raise ValueError(
-                "Invalid screen constraints: min values cannot be greater than max values"
-            )
+            raise ValueError("Invalid screen constraints: min values cannot be greater than max values")
 
     def is_set(self) -> bool:
-        """
-        Returns true if any constraints were set
-        """
+        """Returns true if any constraints were set."""
         return any(value is not None for value in self.__dict__.values())
 
 
 class FingerprintGenerator:
-    """Generates realistic browser fingerprints"""
+    """Generates realistic browser fingerprints."""
 
     fingerprint_generator_network = BayesianNetwork(DATA_DIR / "fingerprint-network.zip")
 
@@ -138,8 +132,7 @@ class FingerprintGenerator:
         slim: bool = False,
         **header_kwargs,
     ):
-        """
-        Initializes the FingerprintGenerator with the given options.
+        """Initializes the FingerprintGenerator with the given options.
 
         Parameters:
             screen (Screen, optional): Screen constraints for the generated fingerprint.
@@ -165,8 +158,7 @@ class FingerprintGenerator:
         slim: Optional[bool] = None,
         **header_kwargs,
     ) -> Fingerprint:
-        """
-        Generates a fingerprint and a matching set of ordered headers using a combination of the default options
+        """Generates a fingerprint and a matching set of ordered headers using a combination of the default options
         specified in the constructor and their possible overrides provided here.
 
         Parameters:
@@ -184,9 +176,7 @@ class FingerprintGenerator:
         screen = _first(screen, self.screen)
         strict = _first(strict, self.strict)
 
-        partial_csp = self.partial_csp(
-            strict=strict, screen=screen, filtered_values=filtered_values
-        )
+        partial_csp = self.partial_csp(strict=strict, screen=screen, filtered_values=filtered_values)
 
         # Generate headers consistent with the inputs to get input-compatible user-agent
         # and accept-language headers needed later
@@ -200,10 +190,8 @@ class FingerprintGenerator:
 
         # Generate fingerprint consistent with the generated user agent
         while True:
-            fingerprint: Optional[Dict] = (
-                self.fingerprint_generator_network.generate_consistent_sample_when_possible(
-                    {**filtered_values, 'userAgent': (user_agent,)}
-                )
+            fingerprint: Optional[Dict] = self.fingerprint_generator_network.generate_consistent_sample_when_possible(
+                {**filtered_values, 'userAgent': (user_agent,)}
             )
             if fingerprint is not None:
                 break
@@ -221,16 +209,12 @@ class FingerprintGenerator:
         for attribute in list(fingerprint.keys()):
             if fingerprint[attribute] == '*MISSING_VALUE*':
                 fingerprint[attribute] = None
-            if isinstance(fingerprint[attribute], str) and fingerprint[attribute].startswith(
-                '*STRINGIFIED*'
-            ):
+            if isinstance(fingerprint[attribute], str) and fingerprint[attribute].startswith('*STRINGIFIED*'):
                 fingerprint[attribute] = json.loads(fingerprint[attribute][len('*STRINGIFIED*') :])
 
         # Manually add the set of accepted languages required by the input
         accept_language_header_value = headers.get('Accept-Language', '')
-        accepted_languages = [
-            locale.split(';', 1)[0] for locale in accept_language_header_value.split(',')
-        ]
+        accepted_languages = [locale.split(';', 1)[0] for locale in accept_language_header_value.split(',')]
         fingerprint['languages'] = accepted_languages
 
         return self._transform_fingerprint(
@@ -240,11 +224,8 @@ class FingerprintGenerator:
             _first(slim, self.slim),
         )
 
-    def partial_csp(
-        self, strict: Optional[bool], screen: Optional[Screen], filtered_values: Dict
-    ) -> Optional[Dict]:
-        """
-        Generates partial content security policy (CSP) based on the provided options and filtered values.
+    def partial_csp(self, strict: Optional[bool], screen: Optional[Screen], filtered_values: Dict) -> Optional[Dict]:
+        """Generates partial content security policy (CSP) based on the provided options and filtered values.
 
         Parameters:
             strict (Optional[bool): Whether to raise an exception if the constraints are too strict.
@@ -260,9 +241,7 @@ class FingerprintGenerator:
 
         filtered_values['screen'] = [
             screen_string
-            for screen_string in self.fingerprint_generator_network.nodes_by_name[
-                'screen'
-            ].possible_values
+            for screen_string in self.fingerprint_generator_network.nodes_by_name['screen'].possible_values
             if self._is_screen_within_constraints(screen_string, screen)
         ]
 
@@ -276,8 +255,7 @@ class FingerprintGenerator:
 
     @staticmethod
     def _is_screen_within_constraints(screen_string: str, screen_options: Screen) -> bool:
-        """
-        Checks if the given screen dimensions are within the specified constraints.
+        """Checks if the given screen dimensions are within the specified constraints.
 
         Parameters:
             screen_string (str): Stringified screen dimensions.
@@ -301,11 +279,8 @@ class FingerprintGenerator:
             return False
 
     @staticmethod
-    def _transform_fingerprint(
-        fingerprint: Dict, headers: Dict, mock_webrtc: bool, slim: bool
-    ) -> Fingerprint:
-        """
-        Transforms fingerprint into a final dataclass instance.
+    def _transform_fingerprint(fingerprint: Dict, headers: Dict, mock_webrtc: bool, slim: bool) -> Fingerprint:
+        """Transforms fingerprint into a final dataclass instance.
 
         Parameters:
             fingerprint (Dict): Fingerprint to be transformed.
@@ -352,9 +327,7 @@ class FingerprintGenerator:
             audioCodecs=fingerprint['audioCodecs'],
             pluginsData=fingerprint['pluginsData'],
             battery=fingerprint['battery'],
-            videoCard=(
-                VideoCard(**fingerprint['videoCard']) if fingerprint.get('videoCard') else None
-            ),
+            videoCard=(VideoCard(**fingerprint['videoCard']) if fingerprint.get('videoCard') else None),
             multimediaDevices=fingerprint['multimediaDevices'],
             fonts=fingerprint['fonts'],
             mockWebRTC=mock_webrtc,
@@ -363,7 +336,5 @@ class FingerprintGenerator:
 
 
 def _first(*values):
-    """
-    Simple function that returns the first non-None value passed
-    """
+    """Simple function that returns the first non-None value passed."""
     return next((v for v in values if v is not None), None)

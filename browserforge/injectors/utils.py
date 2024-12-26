@@ -21,8 +21,8 @@ request_headers: Set[str] = {
 
 
 def only_injectable_headers(headers: Dict[str, str], browser_name: str) -> Dict[str, str]:
-    """
-    Some HTTP headers depend on the request (for example Accept (with values application/json, image/png) etc.).
+    """Some HTTP headers depend on the request (for example Accept (with values application/json, image/png) etc.).
+
     This function filters out those headers and leaves only the browser-wide ones.
     """
     filtered_headers = {k: v for k, v in headers.items() if k.lower() not in request_headers}
@@ -119,19 +119,13 @@ def InjectFunction(fingerprint: Fingerprint) -> str:
 
 
 def utils_js() -> str:
-    """
-    Opens and uncompresses the utils.js file and returns it as a string
-    """
+    """Opens and uncompresses the utils.js file and returns it as a string."""
     with lzma.open(UTILS_JS, 'rt') as f:
         return f.read()
 
 
-def _fingerprint(
-    fingerprint: Optional[Fingerprint] = None, fingerprint_options: Optional[Dict] = None
-) -> Fingerprint:
-    """
-    Generates a fingerprint if one doesnt exist
-    """
+def _fingerprint(fingerprint: Optional[Fingerprint] = None, fingerprint_options: Optional[Dict] = None) -> Fingerprint:
+    """Generates a fingerprint if one doesn't exist."""
     if fingerprint:
         return fingerprint
     generator = FingerprintGenerator()
@@ -139,9 +133,7 @@ def _fingerprint(
 
 
 def CheckIfInstalled(module_name: str):
-    """
-    Checks if a module is installed
-    """
+    """Checks if a module is installed."""
     import importlib.util
 
     return importlib.util.find_spec(module_name) is not None

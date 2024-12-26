@@ -2,16 +2,12 @@ from typing import Any, Dict, Iterable, Optional
 
 
 def get_user_agent(headers: Dict[str, str]) -> Optional[str]:
-    """
-    Retrieves the User-Agent from the headers dictionary.
-    """
+    """Retrieves the User-Agent from the headers dictionary."""
     return headers.get('User-Agent') or headers.get('user-agent')
 
 
 def get_browser(user_agent: str) -> Optional[str]:
-    """
-    Determines the browser name from the User-Agent string.
-    """
+    """Determines the browser name from the User-Agent string."""
     if 'Firefox' in user_agent:
         return 'firefox'
     elif 'Chrome' in user_agent:

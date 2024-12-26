@@ -16,9 +16,7 @@ def cli() -> None:
 @click.option('--headers', is_flag=True, help='Only update header definitions')
 @click.option('--fingerprints', is_flag=True, help='Only update fingerprint definitions')
 def update(headers=False, fingerprints=False):
-    """
-    Fetches header and fingerprint definitions
-    """
+    """Fetches header and fingerprint definitions."""
     # if no options passed, mark both as True
     if not headers ^ fingerprints:
         headers = fingerprints = True
@@ -28,9 +26,7 @@ def update(headers=False, fingerprints=False):
 
 @cli.command(name='remove')
 def remove():
-    """
-    Remove all downloaded files
-    """
+    """Remove all downloaded files."""
     Remove()
     click.secho('Removed all files!', fg='bright_yellow')
 

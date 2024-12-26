@@ -1,0 +1,11 @@
+{
+  "output_style": "google",
+  "accepted_shebangs": [
+    "python"
+  ],
+  "output": {
+    "tab_length": 4,
+    "realign": true,
+    "max_line_length": 120
+  }
+}

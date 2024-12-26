@@ -12,6 +12,7 @@ __pycache__/
 
 # Model files
 *.json
+!docconvert_config.json
 
 # Distribution / packaging
 .Python

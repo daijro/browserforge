@@ -1,6 +1,4 @@
-"""
-utils.js.xz contains a compressed version of the utils.js file
-from Apify's fingerprint-injector:
+"""utils.js.xz contains a compressed version of the utils.js file from Apify's fingerprint-injector:
 
 https://github.com/apify/fingerprint-suite/blob/master/packages/fingerprint-injector/src/utils.js
 

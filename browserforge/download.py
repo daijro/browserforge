@@ -1,7 +1,6 @@
 import shutil
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, Iterator
 
@@ -10,7 +9,6 @@ import click
 """
 Downloads the required model definitions
 """
-
 
 ROOT_DIR: Path = Path(__file__).parent
 
@@ -41,17 +39,14 @@ class DownloadException(Exception):
 
 
 class DataDownloader:
-    """
-    Download and extract data files for both headers and fingerprints.
-    """
+    """Download and extract data files for both headers and fingerprints."""
 
     def __init__(self, **kwargs: bool) -> None:
         self.options = _enabled_flags(kwargs)
 
+    # noinspection PyMethodMayBeStatic
     def download_file(self, url: str, path: str) -> None:
-        """
-        Download a file from the specified URL and save it to the given path.
-        """
+        """Download a file from the specified URL and save it to the given path."""
         with urllib.request.urlopen(url) as resp:  # nosec
             if resp.status != 200:
                 raise DownloadException(f"Download failed with status code: {resp.status}")
@@ -59,9 +54,7 @@ class DataDownloader:
                 shutil.copyfileobj(resp, f)
 
     def download(self) -> None:
-        """
-        Download and extract data files for both headers and fingerprints.
-        """
+        """Download and extract data files for both headers and fingerprints."""
         futures = {}
         with ThreadPoolExecutor(10) as executor:
             for data_type in self.options:
@@ -79,18 +72,14 @@ class DataDownloader:
 
 
 def _enabled_flags(flags: Dict[str, bool]) -> Iterator[str]:
-    """
-    Returns a list of enabled flags based on a given dictionary
-    """
+    """Returns a list of enabled flags based on a given dictionary."""
     for flag, enabled in flags.items():
         if enabled:
             yield flag
 
 
 def _get_all_paths(**flags: bool) -> Iterator[Path]:
-    """
-    Yields all the paths to the downloaded data files
-    """
+    """Yields all the paths to the downloaded data files."""
     for data_type in _enabled_flags(flags):
         data_path = DATA_DIRS[data_type]
         for local_name, _ in DATA_FILES[data_type].items():
@@ -103,9 +92,7 @@ Public download functions
 
 
 def Download(headers=False, fingerprints=False) -> None:
-    """
-    Download the required data files
-    """
+    """Download the required data files."""
     # Announce that files are being downloaded
     click.secho('Downloading model definition files...', fg='bright_yellow')
     try:
@@ -117,17 +104,16 @@ def Download(headers=False, fingerprints=False) -> None:
 
 
 def DownloadIfNotExists(**flags: bool) -> None:
-    """
-    Download the required data files if they don't exist
-    """
+    """Download the required data files if they don't exist."""
     if not IsDownloaded(**flags):
         Download(**flags)
 
 
 def IsDownloaded(**flags: bool) -> bool:
-    """
-    Check if the required data files are already downloaded and not older than a month.
-    Returns True if all the requested data files are present and not older than a month, False otherwise.
+    """Check if the required data files are already downloaded and not older than a month.
+
+    Returns True if all the requested data files are present and not older than a month,
+    False otherwise.
     """
     for path in _get_all_paths(**flags):
         if not path.exists():
@@ -142,8 +128,6 @@ def IsDownloaded(**flags: bool) -> bool:
 
 
 def Remove() -> None:
-    """
-    Deletes all downloaded data files
-    """
+    """Deletes all downloaded data files."""
     for path in _get_all_paths(headers=True, fingerprints=True):
         path.unlink(missing_ok=True)

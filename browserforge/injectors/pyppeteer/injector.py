@@ -5,7 +5,8 @@ from pyppeteer.browser import Browser
 from pyppeteer.page import Page
 
 from browserforge.fingerprints import Fingerprint
-from browserforge.injectors.utils import InjectFunction, _fingerprint, only_injectable_headers
+from browserforge.injectors.utils import (InjectFunction, _fingerprint,
+                                          only_injectable_headers)
 
 
 async def NewPage(
@@ -13,8 +14,7 @@ async def NewPage(
     fingerprint: Optional[Fingerprint] = None,
     fingerprint_options: Optional[Dict] = None,
 ) -> Page:
-    """
-    Injects a Pyppeteer browser object with a Fingerprint.
+    """Injects a Pyppeteer browser object with a Fingerprint.
 
     Parameters:
         browser (Browser): The browser to create the context in
@@ -37,9 +37,7 @@ async def NewPage(
             'screenWidth': fingerprint.screen.width,
             'width': fingerprint.screen.width,
             'height': fingerprint.screen.height,
-            'mobile': any(
-                name in fingerprint.navigator.userAgent for name in ('phone', 'android', 'mobile')
-            ),
+            'mobile': any(name in fingerprint.navigator.userAgent for name in ('phone', 'android', 'mobile')),
             'screenOrientation': (
                 {'angle': 0, 'type': 'portraitPrimary'}
                 if fingerprint.screen.height > fingerprint.screen.width

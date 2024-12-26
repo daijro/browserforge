@@ -4,14 +4,9 @@ DownloadIfNotExists(fingerprints=True, headers=True)
 
 from browserforge.headers import Browser
 
-from .generator import (
-    Fingerprint,
-    FingerprintGenerator,
-    NavigatorFingerprint,
-    Screen,
-    ScreenFingerprint,
-    VideoCard,
-)
+from .generator import (Fingerprint, FingerprintGenerator,
+                        NavigatorFingerprint, Screen, ScreenFingerprint,
+                        VideoCard)
 
 __all__ = [
     "Browser",

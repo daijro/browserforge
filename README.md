@@ -34,7 +34,8 @@
 
 ## What is it?
 
-BrowserForge is a browser header and fingerprint generator that mimics the frequency of different browsers, operating systems, and devices found in the wild.
+BrowserForge is a browser header and fingerprint generator that mimics the frequency of different browsers, operating
+systems, and devices found in the wild.
 
 It is a reimplementation of [Apify's fingerprint-suite](https://github.com/apify/fingerprint-suite) in Python.
 
@@ -55,14 +56,16 @@ python -m browserforge update
 
 The `[all]` extra will include optional libraries like orjson.
 
-Use `python -m browserforge update` to fetch necessary model files. If the command is not run, files will be downloaded on the first import.
+Use `python -m browserforge update` to fetch necessary model files. If the command is not run, files will be downloaded
+on the first import.
 
 <hr width=50>
 
 ## Important Notice
 
 > [!WARNING]
-> As of BrowserForge 1.2.1, the model files are frozen to v2.1.58. Newer model files have been contaminated with SQL and CLI injection attacks.
+> As of BrowserForge 1.2.1, the model files are frozen to v2.1.58. Newer model files have been contaminated with SQL and
+> CLI injection attacks.
 > Please update to the latest version of BrowserForge.
 
 <hr width=50>
@@ -73,20 +76,35 @@ Use `python -m browserforge update` to fetch necessary model files. If the comma
 
 ### Simple usage
 
-```py
->>> from browserforge.headers import HeaderGenerator
->>> headers = HeaderGenerator()
->>> headers.generate()
-{'sec-ch-ua': '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"', 'Sec-Ch-Ua-Mobile': '?0', 'Sec-Ch-Ua-Platform': '"Windows"', 'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36', 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'Sec-Fetch-Site': '?1', 'Sec-Fetch-Mode': 'same-site', 'Sec-Fetch-User': 'document', 'Sec-Fetch-Dest': 'navigate', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept-Language': 'en-US;q=1.0'}
+```python
+from browserforge.headers import HeaderGenerator
+
+headers = HeaderGenerator()
+headers.generate()
+
+{'sec-ch-ua': '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"', 'Sec-Ch-Ua-Mobile': '?0',
+ 'Sec-Ch-Ua-Platform': '"Windows"', 'Upgrade-Insecure-Requests': '1',
+ 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+ 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+ 'Sec-Fetch-Site': '?1', 'Sec-Fetch-Mode': 'same-site', 'Sec-Fetch-User': 'document', 'Sec-Fetch-Dest': 'navigate',
+ 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept-Language': 'en-US;q=1.0'
+ }
 ```
 
 ### Using with requests
 
-Headers can be added to a session in [requests](https://github.com/psf/requests) (or similar libraries) by assigning them to the `headers` attribute:
+Headers can be added to a session in [requests](https://github.com/psf/requests) (or similar libraries) by assigning
+them to the `headers` attribute:
 
-```py
+```python
+from browserforge.headers import HeaderGenerator
 import requests
+
 session = requests.Session()
+
+headers = HeaderGenerator()
+headers.generate()
+
 # Set the session headers
 session.headers = headers.generate()
 ```
@@ -131,7 +149,9 @@ Parameters:
 
 Set constraints for browsers by passing the optional strings below:
 
-```py
+```python
+from browserforge.headers import HeaderGenerator
+
 headers = HeaderGenerator(
     browser='chrome',
     os='windows',
@@ -145,7 +165,9 @@ headers = HeaderGenerator(
 
 Set multiple constraints to select from. Options are selected based on their actual frequency in the wild:
 
-```py
+```python
+from browserforge.headers import HeaderGenerator
+
 headers = HeaderGenerator(
     browser=('chrome', 'firefox', 'safari', 'edge'),
     os=('windows', 'macos', 'linux', 'android', 'ios'),
@@ -157,10 +179,11 @@ headers = HeaderGenerator(
 
 #### Browser specifications
 
-Set specificiations for browsers, including version ranges and HTTP version:
+Set specifications for browsers, including version ranges and HTTP version:
 
-```py
+```python
 from browserforge.headers import Browser
+from browserforge.headers import HeaderGenerator
 
 browsers = [
     Browser(name='chrome', min_version=100, max_version=110),
@@ -170,20 +193,28 @@ browsers = [
 headers = HeaderGenerator(browser=browsers)
 ```
 
-Note that all constraints passed into the `HeaderGenerator` constructor can be overridden by passing them into the `generate` method.
+Note that all constraints passed into the `HeaderGenerator` constructor can be overridden by passing them into the
+`generate` method.
 
 #### Generate headers given User-Agent
 
 Headers can be generated given an existing user agent:
 
-```py
->>> headers.generate(user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36')
+```python
+from browserforge.headers import HeaderGenerator
+
+headers = HeaderGenerator()
+headers.generate(
+    user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36')
 ```
 
 Select from multiple User-Agents based on their frequency in the wild:
 
-```py
->>> headers.generate(user_agent=(
+```python
+from browserforge.headers import HeaderGenerator
+
+headers = HeaderGenerator()
+headers.generate(user_agent=(
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0'
 ))
@@ -197,8 +228,9 @@ Select from multiple User-Agents based on their frequency in the wild:
 
 Initialize FingerprintGenerator:
 
-```py
+```python
 from browserforge.fingerprints import FingerprintGenerator
+
 fingerprints = FingerprintGenerator()
 fingerprints.generate()
 ```
@@ -463,13 +495,13 @@ Fingerprint(screen=ScreenFingerprint(availHeight=784,
 Constrain the minimum/maximum screen width and height:
 
 ```py
-from browserforge.fingerprints import Screen
+from browserforge.fingerprints import Screen, FingerprintGenerator
 
 screen = Screen(
-    min_width=100
-    max_width=1280
-    min_height=400
-    max_height=720
+    min_width=100,
+    max_width=1280,
+    min_height=400,
+    max_height=720,
 )
 
 fingerprints = FingerprintGenerator(screen=screen)
@@ -481,12 +513,17 @@ Note: Not all bounds need to be defined.
 
 `FingerprintGenerator` and `FingerprintGenerator.generate` inherit the same parameters from `HeaderGenerator`.
 
-Because of this, user agents, browser specifications, device types, and operating system constrains can also be passed into `FingerprintGenerator.generate`.
+Because of this, user agents, browser specifications, device types, and operating system constrains can also be passed
+into `FingerprintGenerator.generate`.
 
 Here is a usage example:
 
-```py
-fingerprint.generate(browser='chrome', os='windows')
+```python
+from browserforge.fingerprints import FingerprintGenerator
+
+fingerprint_generator = FingerprintGenerator()
+
+fingerprint_generator.generate(browser='chrome', os='windows')
 ```
 
 <hr width=50>
@@ -496,7 +533,8 @@ fingerprint.generate(browser='chrome', os='windows')
 > [!WARNING]
 > Fingerprint injection in BrowserForge is deprecated. Please check out [Camoufox] instead.
 
-BrowserForge is fully compatible with your existing Playwright and Pyppeteer code. You only have to change your context/page initialization.
+BrowserForge is fully compatible with your existing Playwright and Pyppeteer code. You only have to change your
+context/page initialization.
 
 ### Playwright
 
@@ -505,6 +543,8 @@ BrowserForge is fully compatible with your existing Playwright and Pyppeteer cod
 ```py
 # Import the AsyncNewContext injector
 from browserforge.injectors.playwright import AsyncNewContext
+from playwright.async_api import async_playwright
+
 
 async def main():
     async with async_playwright() as playwright:
@@ -538,6 +578,7 @@ Parameters:
 # Import the NewContext injector
 from browserforge.injectors.playwright import NewContext
 
+
 def main():
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
@@ -566,7 +607,8 @@ Parameters:
 
 #### Undetected-Playwright
 
-[Undetected-Playwright](https://github.com/kaliiiiiiiiii/undetected-playwright-python) is also supported in the `browserforge.injectors.undetected_playwright` package. The usage is the same as the Playwright injector.
+[Undetected-Playwright](https://github.com/kaliiiiiiiiii/undetected-playwright-python) is also supported in the
+`browserforge.injectors.undetected_playwright` package. The usage is the same as the Playwright injector.
 
 ### Pyppeteer
 
@@ -574,6 +616,7 @@ Parameters:
 # Import the NewPage injector
 from browserforge.injectors.pyppeteer import NewPage
 from pyppeteer import launch
+
 
 async def test():
     browser = await launch()
@@ -604,7 +647,7 @@ Parameters:
 
 To fully remove all files, run the following commands:
 
-```
+```bash
 python -m browserforge remove
 pip uninstall browserforge
 ```
