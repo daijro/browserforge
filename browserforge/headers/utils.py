@@ -12,13 +12,13 @@ def get_browser(user_agent: str) -> Optional[str]:
     """
     Determines the browser name from the User-Agent string.
     """
-    if 'Firefox' in user_agent:
+    if any(alias in user_agent for alias in ('Firefox', 'FxiOS')):
         return 'firefox'
-    elif 'Chrome' in user_agent:
+    elif any(alias in user_agent for alias in ('Chrome', 'CriOS')):
         return 'chrome'
     elif 'Safari' in user_agent:
         return 'safari'
-    elif 'Edge' in user_agent:
+    elif any(alias in user_agent for alias in ('Edge', 'EdgA', 'Edg', 'EdgiOS')):
         return 'edge'
     return None
 
