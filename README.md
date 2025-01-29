@@ -59,14 +59,6 @@ Use `python -m browserforge update` to fetch necessary model files. If the comma
 
 <hr width=50>
 
-## Important Notice
-
-> [!WARNING]
-> As of BrowserForge 1.2.1, the model files are frozen to v2.1.58. Newer model files have been contaminated with SQL and CLI injection attacks.
-> Please update to the latest version of BrowserForge.
-
-<hr width=50>
-
 ## Usage
 
 ## Generating Headers

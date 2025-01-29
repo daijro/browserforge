@@ -31,8 +31,8 @@ DATA_FILES: Dict[str, Dict[str, str]] = {
     },
 }
 REMOTE_PATHS: Dict[str, str] = {
-    "headers": "https://github.com/apify/fingerprint-suite/raw/refs/tags/v2.1.58/packages/header-generator/src/data_files",
-    "fingerprints": "https://github.com/apify/fingerprint-suite/raw/refs/tags/v2.1.58/packages/fingerprint-generator/src/data_files",
+    "headers": "https://github.com/apify/fingerprint-suite/raw/master/packages/header-generator/src/data_files",
+    "fingerprints": "https://github.com/apify/fingerprint-suite/raw/master/packages/fingerprint-generator/src/data_files",
 }
 
 
@@ -132,13 +132,11 @@ def IsDownloaded(**flags: bool) -> bool:
     for path in _get_all_paths(**flags):
         if not path.exists():
             return False
-    # Check if the file is older than a month
 
-    # As of BrowserForge 1.2.1, this is not needed as it is frozen to v2.1.58
-    # file_creation_time = datetime.fromtimestamp(path.stat().st_ctime)
-    # one_month_ago = datetime.now() - timedelta(weeks=5)
-    # return file_creation_time >= one_month_ago
-    return True
+    # Check if the file is older than a month
+    file_creation_time = datetime.fromtimestamp(path.stat().st_ctime)
+    one_month_ago = datetime.now() - timedelta(weeks=5)
+    return file_creation_time >= one_month_ago
 
 
 def Remove() -> None:

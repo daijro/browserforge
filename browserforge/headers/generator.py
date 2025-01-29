@@ -12,9 +12,9 @@ except ImportError:
     import json
 
 try:
-    from typing import TypeAlias
+    from typing import TypeAlias  # novm
 except ImportError:
-    from typing_extensions import TypeAlias  # < 3.10
+    from typing_extensions import TypeAlias  # <3.10
 
 
 """Constants"""
