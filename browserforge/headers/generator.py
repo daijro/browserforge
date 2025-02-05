@@ -423,8 +423,8 @@ class HeaderGenerator:
             str: Accept-Language header string.
         """
         # First locale does not include quality factor, q=1 is considered as implicit.
-        additional_locales = [f"{locale};q={0.9 - index * 0.1:.1f}" for index, locale in enumerate(locales[1:])]
-        return ','.join(locales[:1] + additional_locales)
+        additional_locales = [f'{locale};q={0.9 - index * 0.1:.1f}' for index, locale in enumerate(locales[1:])]
+        return ','.join((locales[0], *additional_locales))
 
     def _load_headers_order(self) -> Dict[str, List[str]]:
         """
