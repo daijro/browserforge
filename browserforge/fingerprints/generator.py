@@ -2,6 +2,8 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from apify_fingerprint_datapoints import get_fingerprint_network
+
 from browserforge.bayesian_network import BayesianNetwork, get_possible_values
 from browserforge.headers import HeaderGenerator
 from browserforge.headers.utils import get_user_agent
@@ -128,7 +130,7 @@ class Screen:
 class FingerprintGenerator:
     """Generates realistic browser fingerprints"""
 
-    fingerprint_generator_network = BayesianNetwork(DATA_DIR / "fingerprint-network.zip")
+    fingerprint_generator_network = BayesianNetwork(get_fingerprint_network())
 
     def __init__(
         self,

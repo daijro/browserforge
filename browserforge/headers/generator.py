@@ -1,8 +1,9 @@
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple, Union
 
 from browserforge.bayesian_network import BayesianNetwork, get_possible_values
+from apify_fingerprint_datapoints import (get_header_network, get_headers_order, get_browser_helper_file,
+                                          get_input_network)
 
 from .utils import get_browser, get_user_agent, pascalize_headers, tuplify
 
@@ -35,7 +36,6 @@ HTTP2_SEC_FETCH_ATTRIBUTES = {
     'sec-fetch-site': '?1',
     'sec-fetch-user': 'document',
 }
-DATA_DIR: Path = Path(__file__).parent / 'data'
 ListOrString: TypeAlias = Union[Tuple[str, ...], List[str], str]
 
 
@@ -83,8 +83,8 @@ class HeaderGenerator:
     relaxation_order: Tuple[str, ...] = ('locales', 'devices', 'operatingSystems', 'browsers')
 
     # Initialize networks
-    input_generator_network = BayesianNetwork(DATA_DIR / "input-network.zip")
-    header_generator_network = BayesianNetwork(DATA_DIR / "header-network.zip")
+    input_generator_network = BayesianNetwork(get_input_network())
+    header_generator_network = BayesianNetwork(get_header_network())
 
     def __init__(
         self,
@@ -433,8 +433,7 @@ class HeaderGenerator:
         Returns:
             Dict[str, List[str]]: Dictionary of headers order for each browser.
         """
-        headers_order_path = DATA_DIR / "headers-order.json"
-        return json.loads(headers_order_path.read_bytes())
+        return json.loads(get_headers_order().read_bytes())
 
     def _load_unique_browsers(self) -> List[HttpBrowserObject]:
         """
@@ -443,8 +442,7 @@ class HeaderGenerator:
         Returns:
             List[HttpBrowserObject]: List of HttpBrowserObject instances.
         """
-        browser_helper_path = DATA_DIR / 'browser-helper-file.json'
-        unique_browser_strings = json.loads(browser_helper_path.read_bytes())
+        unique_browser_strings = json.loads(get_browser_helper_file().read_bytes())
         return [
             self._prepare_http_browser_object(browser_str)
             for browser_str in unique_browser_strings
