@@ -50,15 +50,7 @@ It is a reimplementation of [Apify's fingerprint-suite](https://github.com/apify
 
 ```
 pip install browserforge[all]
-python -m browserforge update
 ```
-
-The `[all]` extra will include optional libraries like orjson.
-
-Use `python -m browserforge update` to fetch necessary model files. If the command is not run, files will be downloaded on the first import.
-
-<hr width=50>
-
 ## Usage
 
 ## Generating Headers
@@ -594,10 +586,7 @@ Parameters:
 
 ## Uninstall
 
-To fully remove all files, run the following commands:
-
 ```
-python -m browserforge remove
 pip uninstall browserforge
 ```
 
