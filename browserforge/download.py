@@ -31,8 +31,8 @@ DATA_FILES: Dict[str, Dict[str, str]] = {
     },
 }
 REMOTE_PATHS: Dict[str, str] = {
-    "headers": "https://github.com/apify/fingerprint-suite/raw/master/packages/header-generator/src/data_files",
-    "fingerprints": "https://github.com/apify/fingerprint-suite/raw/master/packages/fingerprint-generator/src/data_files",
+    "headers": "https://github.com/apify/fingerprint-suite/raw/v2.1.66/packages/header-generator/src/data_files",
+    "fingerprints": "https://github.com/apify/fingerprint-suite/raw/v2.1.66/packages/fingerprint-generator/src/data_files",
 }
 
 
