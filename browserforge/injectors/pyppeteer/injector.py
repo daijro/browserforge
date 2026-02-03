@@ -51,7 +51,7 @@ async def NewPage(
     await page.setExtraHTTPHeaders(only_injectable_headers(fingerprint.headers, 'chrome'))
 
     # Only set to dark mode if the Chrome version >= 76
-    version = re.search('.*?/(\d+)[\d\.]+?', await browser.version())
+    version = re.search(r'.*?/(\d+)[\d\.]+?', await browser.version())
     if version and int(version[1]) >= 76:
         await page._client.send(
             'Emulation.setEmulatedMedia',
