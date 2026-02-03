@@ -1,5 +1,4 @@
 import click
-from click import secho
 
 """
 Stub cli for backwards compatibility to not break existing projects on <1.2.4
@@ -7,7 +6,14 @@ Stub cli for backwards compatibility to not break existing projects on <1.2.4
 
 
 class DownloadException(Exception):
-    """Raises when the download fails."""
+    """**DEPRECATED**"""
+
+
+def _deprecated() -> None:
+    click.secho(
+        'DEPRECATED: As of v1.2.4, BrowserForge model files are now bundled in their own Python package dependency.',
+        fg='red',
+    )
 
 
 @click.group()
@@ -15,7 +21,7 @@ def cli() -> None:
     """
     NOTE: BrowserForge CLI is DEPRECATED!
 
-    As of 1.2.4, model files are included as its own Python package dependency.
+    BrowserForge: As of v1.2.4, model files are already bundled in their own package dependency.
     Manual downloads are no longer required.
     """
     pass
@@ -28,11 +34,7 @@ def update(headers=False, fingerprints=False):
     """
     **DEPRECATED**
     """
-    secho(
-        'BrowserForge: As of v1.2.4, model files are included in their own Python package dependency.',
-        fg='bright_yellow',
-    )
-    pass
+    _deprecated()
 
 
 @cli.command(name='remove')
@@ -40,11 +42,7 @@ def remove():
     """
     **DEPRECATED**
     """
-    secho(
-        'BrowserForge: As of v1.2.4, model files are included in their own Python package dependency.',
-        fg='bright_yellow',
-    )
-    pass
+    _deprecated()
 
 
 if __name__ == '__main__':

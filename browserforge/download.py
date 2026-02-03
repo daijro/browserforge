@@ -11,8 +11,8 @@ def Download(headers=False, fingerprints=False) -> None:
     As of v1.2.4, model files are included in their own Python package dependency.
     """
     secho(
-        'BrowserForge: As of v1.2.4, model files are included in their own Python package dependency.',
-        fg='bright_yellow',
+        'BrowserForge model files are now bundled in their own Python package dependency. This command is deprecated.',
+        fg='bright_black',
     )
 
 
