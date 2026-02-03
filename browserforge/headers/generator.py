@@ -2,8 +2,12 @@ from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple, Union
 
 from browserforge.bayesian_network import BayesianNetwork, get_possible_values
-from apify_fingerprint_datapoints import (get_header_network, get_headers_order, get_browser_helper_file,
-                                          get_input_network)
+from apify_fingerprint_datapoints import (
+    get_header_network,
+    get_headers_order,
+    get_browser_helper_file,
+    get_input_network,
+)
 
 from .utils import get_browser, get_user_agent, pascalize_headers, tuplify
 

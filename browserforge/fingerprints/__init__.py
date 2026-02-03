@@ -1,7 +1,3 @@
-from browserforge.download import DownloadIfNotExists
-
-DownloadIfNotExists(fingerprints=True, headers=True)
-
 from browserforge.headers import Browser
 
 from .generator import (

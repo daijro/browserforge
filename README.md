@@ -450,10 +450,10 @@ Constrain the minimum/maximum screen width and height:
 from browserforge.fingerprints import Screen
 
 screen = Screen(
-    min_width=100
-    max_width=1280
-    min_height=400
-    max_height=720
+    min_width=100,
+    max_width=1280,
+    min_height=400,
+    max_height=720,
 )
 
 fingerprints = FingerprintGenerator(screen=screen)

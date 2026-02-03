@@ -1,47 +1,42 @@
-
-import click
-
-"""
-Downloads the required model definitions - deprecated
-"""
-
+from click import secho
 
 """
-Public download functions
+Public download functions (deprecated)
 """
 
 
 def Download(headers=False, fingerprints=False) -> None:
     """
-    Deprecated. Downloading model definition files is no longer needed.
-
-    Files are included as explicit python package dependency.
+    **DEPRECATED**
+    As of v1.2.4, model files are included in their own Python package dependency.
     """
-    click.secho('Deprecated. Downloading model definition files is no longer needed.', fg='bright_yellow')
+    secho(
+        'BrowserForge: As of v1.2.4, model files are included in their own Python package dependency.',
+        fg='bright_yellow',
+    )
 
 
 def DownloadIfNotExists(**flags: bool) -> None:
     """
-    Deprecated. Downloading model definition files is no longer needed.
-
-    Files are included as explicit python package dependency.
+    **DEPRECATED**
+    As of v1.2.4, model files are included in their own Python package dependency.
+    Mark as downloaded by default.
     """
     pass
 
 
 def IsDownloaded(**flags: bool) -> bool:
     """
-    Deprecated. Downloading model definition files is no longer needed.
-
-    Files are included as explicit python package dependency.
+    **DEPRECATED**
+    As of v1.2.4, model files are included in their own Python package dependency.
+    Mark as downloaded by default.
     """
     return True
 
 
 def Remove() -> None:
     """
-    Deprecated. Downloading model definition files is no longer needed.
-
-    Files are included as explicit python package dependency.
+    **DEPRECATED**
+    As of v1.2.4, model files are included in their own Python package dependency.
     """
     pass
