@@ -68,7 +68,6 @@ Upgrade your proxies. Reduce bans. Scale properly
 
 ---
 
-
 ## Features
 
 - Uses a Bayesian generative network to mimic actual web traffic
@@ -82,7 +81,8 @@ Upgrade your proxies. Reduce bans. Scale properly
 ```
 pip install browserforge[all]
 ```
-# Usage
+
+---
 
 ## Generating Headers
 
