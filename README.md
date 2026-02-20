@@ -38,6 +38,37 @@ BrowserForge is a browser header and fingerprint generator that mimics the frequ
 
 It is a reimplementation of [Apify's fingerprint-suite](https://github.com/apify/fingerprint-suite) in Python.
 
+---
+
+## Sponsor
+
+### 🚀 BrowserForge × ProxyEmpire
+
+<img width="350" alt="proxylayer" src="https://github.com/user-attachments/assets/d1c5f849-5cb0-4aff-b48c-530bda2ee03f" />
+
+Using BrowserForge? Your proxy layer decides whether you scale — or get blocked.
+
+[ProxyEmpire](https://proxyempire.io/?ref=camoufox) delivers:
+
+- 🌍 30M+ Residential IPs (170+ countries)
+- 📱 4G/5G Mobile Proxies
+- 🔄 Rotating & Sticky Sessions
+- ⚡ Unlimited Concurrent Sessions
+- 🎯 Precise geo-targeting
+- HTTP, HTTPS & SOCKS5 Support
+
+Built for scraping, automation, and high-stealth workflows.
+
+#### 🔥 Exclusive Offer
+
+Use code **BrowserForge30**\
+Get **30% recurring discount** (not just first month).
+
+Upgrade your proxies. Reduce bans. Scale properly
+
+---
+
+
 ## Features
 
 - Uses a Bayesian generative network to mimic actual web traffic
@@ -51,7 +82,7 @@ It is a reimplementation of [Apify's fingerprint-suite](https://github.com/apify
 ```
 pip install browserforge[all]
 ```
-## Usage
+# Usage
 
 ## Generating Headers
 
