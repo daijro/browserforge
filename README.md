@@ -615,6 +615,12 @@ Parameters:
 
 <hr width=50>
 
+### Command line usage
+
+Generate and print headers in a Curl-compatible format:
+
+    generate-headers
+
 ## Uninstall
 
 ```

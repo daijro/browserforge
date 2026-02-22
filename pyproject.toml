@@ -36,3 +36,6 @@ apify_fingerprint_datapoints = "*"
 
 [tool.poetry.extras]
 all = ["orjson"]
+
+[tool.poetry.scripts]
+generate-headers = "browserforge.cli:main"
