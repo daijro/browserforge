@@ -40,11 +40,21 @@ It is a reimplementation of [Apify's fingerprint-suite](https://github.com/apify
 
 ---
 
-## Sponsor
+## Sponsors
+
+<a href="https://serpapi.com/use-cases/web-search-api?utm_source=camoufox" target="_blank">
+    <img width="275" alt="color horizontal" src="https://github.com/user-attachments/assets/cdf90178-869e-4f85-8288-3fe32da319d9"/>
+</a>
+
+[SerpApi, a web search API](https://serpapi.com/use-cases/web-search-api?utm_source=camoufox) to scrape Google and other search engines with a simple API.
+
+---
 
 ### 🚀 BrowserForge × ProxyEmpire
 
-<img width="350" alt="proxylayer" src="https://github.com/user-attachments/assets/d1c5f849-5cb0-4aff-b48c-530bda2ee03f" />
+<a href="https://proxyempire.io/?ref=camoufox" target="_blank">
+  <img width="400" alt="proxyempire" src="https://github.com/user-attachments/assets/d1c5f849-5cb0-4aff-b48c-530bda2ee03f" />
+</a>
 
 Using BrowserForge? Your proxy layer decides whether you scale — or get blocked.
 
@@ -75,6 +85,8 @@ Upgrade your proxies. Reduce bans. Scale properly
 - Easy and simple for humans to use
 - Extensive customization options for browsers, operating systems, devices, locales, and HTTP version
 - Written with type safety
+
+---
 
 ## Installation
 
