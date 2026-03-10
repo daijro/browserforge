@@ -99,6 +99,23 @@ class Fingerprint:
         # Instead, convert to a dict first
         return json.dumps(asdict(self))
 
+    @classmethod
+    def loads(cls, json_string: str) -> 'Fingerprint':
+        """
+        Loads a fingerprint from a JSON string.
+        """
+        data = json.loads(json_string)
+
+        # Reconstruct nested dataclasses
+        if 'screen' in data:
+            data['screen'] = ScreenFingerprint(**data['screen'])
+        if 'navigator' in data:
+            data['navigator'] = NavigatorFingerprint(**data['navigator'])
+        if 'videoCard' in data and data['videoCard']:
+            data['videoCard'] = VideoCard(**data['videoCard'])
+
+        return cls(**data)
+
 
 @dataclass
 class Screen:
@@ -111,10 +128,10 @@ class Screen:
 
     def __post_init__(self):
         if (
-            None not in (self.min_width, self.max_width)
-            and self.min_width > self.max_width
-            or None not in (self.min_height, self.max_height)
-            and self.min_height > self.max_height
+                None not in (self.min_width, self.max_width)
+                and self.min_width > self.max_width
+                or None not in (self.min_height, self.max_height)
+                and self.min_height > self.max_height
         ):
             raise ValueError(
                 "Invalid screen constraints: min values cannot be greater than max values"
@@ -133,12 +150,12 @@ class FingerprintGenerator:
     fingerprint_generator_network = BayesianNetwork(get_fingerprint_network())
 
     def __init__(
-        self,
-        screen: Optional[Screen] = None,
-        strict: bool = False,
-        mock_webrtc: bool = False,
-        slim: bool = False,
-        **header_kwargs,
+            self,
+            screen: Optional[Screen] = None,
+            strict: bool = False,
+            mock_webrtc: bool = False,
+            slim: bool = False,
+            **header_kwargs,
     ):
         """
         Initializes the FingerprintGenerator with the given options.
@@ -159,13 +176,13 @@ class FingerprintGenerator:
         self.slim: bool = slim
 
     def generate(
-        self,
-        *,
-        screen: Optional[Screen] = None,
-        strict: Optional[bool] = None,
-        mock_webrtc: Optional[bool] = None,
-        slim: Optional[bool] = None,
-        **header_kwargs,
+            self,
+            *,
+            screen: Optional[Screen] = None,
+            strict: Optional[bool] = None,
+            mock_webrtc: Optional[bool] = None,
+            slim: Optional[bool] = None,
+            **header_kwargs,
     ) -> Fingerprint:
         """
         Generates a fingerprint and a matching set of ordered headers using a combination of the default options
@@ -224,9 +241,9 @@ class FingerprintGenerator:
             if fingerprint[attribute] == '*MISSING_VALUE*':
                 fingerprint[attribute] = None
             if isinstance(fingerprint[attribute], str) and fingerprint[attribute].startswith(
-                '*STRINGIFIED*'
+                    '*STRINGIFIED*'
             ):
-                fingerprint[attribute] = json.loads(fingerprint[attribute][len('*STRINGIFIED*') :])
+                fingerprint[attribute] = json.loads(fingerprint[attribute][len('*STRINGIFIED*'):])
 
         # Manually add the set of accepted languages required by the input
         accept_language_header_value = headers.get('Accept-Language', '')
@@ -243,7 +260,7 @@ class FingerprintGenerator:
         )
 
     def partial_csp(
-        self, strict: Optional[bool], screen: Optional[Screen], filtered_values: Dict
+            self, strict: Optional[bool], screen: Optional[Screen], filtered_values: Dict
     ) -> Optional[Dict]:
         """
         Generates partial content security policy (CSP) based on the provided options and filtered values.
@@ -289,22 +306,22 @@ class FingerprintGenerator:
             bool: True if the screen dimensions are within the constraints, False otherwise.
         """
         try:
-            screen = json.loads(screen_string[len('*STRINGIFIED*') :])
+            screen = json.loads(screen_string[len('*STRINGIFIED*'):])
             return (
                 # Ensure that the screen width/height are greater than the minimum constraints
                 # Default missing values to -1 to ensure they are excluded
-                screen.get('width', -1) >= (screen_options.min_width or 0)
-                and screen.get('height', -1) >= (screen_options.min_height or 0)
-                # Ensure that the screen width/height are less than the maximum constraints
-                and screen.get('width', 0) <= (screen_options.max_width or 1e5)
-                and screen.get('height', 0) <= (screen_options.max_height or 1e5)
+                    screen.get('width', -1) >= (screen_options.min_width or 0)
+                    and screen.get('height', -1) >= (screen_options.min_height or 0)
+                    # Ensure that the screen width/height are less than the maximum constraints
+                    and screen.get('width', 0) <= (screen_options.max_width or 1e5)
+                    and screen.get('height', 0) <= (screen_options.max_height or 1e5)
             )
         except (ValueError, TypeError):
             return False
 
     @staticmethod
     def _transform_fingerprint(
-        fingerprint: Dict, headers: Dict, mock_webrtc: bool, slim: bool
+            fingerprint: Dict, headers: Dict, mock_webrtc: bool, slim: bool
     ) -> Fingerprint:
         """
         Transforms fingerprint into a final dataclass instance.
