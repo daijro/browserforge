@@ -52,13 +52,13 @@ It is a reimplementation of [Apify's fingerprint-suite](https://github.com/apify
 
 ### 🚀 BrowserForge × ProxyEmpire
 
-<a href="https://proxyempire.io/?ref=camoufox&utm_source=browserforge" target="_blank">
+<a href="https://proxyempire.io/?ref=camoufox&utm_source=github&utm_medium=paid_referral&utm_campaign=open_source_sponsorship&utm_content=browserforge" target="_blank">
   <img width="400" alt="proxyempire" src="https://github.com/user-attachments/assets/d1c5f849-5cb0-4aff-b48c-530bda2ee03f" />
 </a>
 
 Using BrowserForge? Your proxy layer decides whether you scale — or get blocked.
 
-[ProxyEmpire](https://proxyempire.io/?ref=camoufox&utm_source=browserforge) delivers:
+[ProxyEmpire](https://proxyempire.io/?ref=camoufox&utm_source=github&utm_medium=paid_referral&utm_campaign=open_source_sponsorship&utm_content=browserforge) delivers:
 
 - 🌍 30M+ Residential IPs (170+ countries)
 - 📱 4G/5G Mobile Proxies
