@@ -29,16 +29,16 @@ SUPPORTED_DEVICES = ('desktop', 'mobile')
 SUPPORTED_HTTP_VERSIONS = ('1', '2')
 MISSING_VALUE_DATASET_TOKEN = '*MISSING_VALUE*'
 HTTP1_SEC_FETCH_ATTRIBUTES = {
-    'Sec-Fetch-Mode': 'same-site',
-    'Sec-Fetch-Dest': 'navigate',
-    'Sec-Fetch-Site': '?1',
-    'Sec-Fetch-User': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Site': 'same-site',
+    'Sec-Fetch-User': '?1',
 }
 HTTP2_SEC_FETCH_ATTRIBUTES = {
-    'sec-fetch-mode': 'same-site',
-    'sec-fetch-dest': 'navigate',
-    'sec-fetch-site': '?1',
-    'sec-fetch-user': 'document',
+    'sec-fetch-mode': 'navigate',
+    'sec-fetch-dest': 'document',
+    'sec-fetch-site': 'same-site',
+    'sec-fetch-user': '?1',
 }
 ListOrString: TypeAlias = Union[Tuple[str, ...], List[str], str]
 
